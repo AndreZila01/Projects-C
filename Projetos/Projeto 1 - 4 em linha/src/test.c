@@ -11,7 +11,7 @@ struct Jogador
 } jogador[50];
 struct JogoAtivo
 {
-    char *Tabuleiro;
+    char* Tabuleiro;
     char *Jogador0;
     char *Jogador1;
     bool Jogando; // false - Por Inciar || true - A decorrer
@@ -52,7 +52,7 @@ int FindIndex(char *Nome)
 {
     for (int count = 0; count < (sizeof jogador / sizeof jogador[0]); count++)
         if (jogador[count].Nome != 0x0)
-            if (strtok(jogador[count].Nome, Nome) == 0)
+            if (strcmp(jogador[count].Nome, Nome) == 0)
                 return count;
 
     return -1;
@@ -81,6 +81,8 @@ void D(char *Utilizador, int idUtiliz)
 }
 void switchcase(char *linha)
 {
+
+
     char *comando = strtok(linha, " "); //.Split(new string [] {""}, none);
     if (strcmp(comando, "RJ") == 0)     // strcmp irá comparar o primeiro espaçamento com IJ, se for verdade retorna 0
     {
@@ -134,10 +136,10 @@ void switchcase(char *linha)
     {
         FILE *fp;
         char *buff;
-
-        fp = fopen("/tmp/test.txt", "r");
-        fscanf(fp, "%s", buff);
-        printf("1 : %s\n", buff);
+        fp = fopen("fprintf_test.txt", "r");
+        fgets(buff, 100000, (FILE *)fp);
+        printf("%s\n", buff);
+        fclose(fp);
     }
     else
         printf("O valor inserido nao tem correspondencia.\n");
