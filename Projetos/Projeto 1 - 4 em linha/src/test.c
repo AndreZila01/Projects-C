@@ -11,7 +11,7 @@ struct Jogador
 } jogador[50];
 struct JogoAtivo
 {
-    char* Tabuleiro;
+    int Tabuleiro[50][50];
     char *Jogador0;
     char *Jogador1;
     bool Jogando; // false - Por Inciar || true - A decorrer
@@ -79,9 +79,106 @@ char *EJ(char *Nome)
 void D(char *Utilizador, int idUtiliz)
 {
 }
-void switchcase(char *linha)
+
+bool CheckWin(int numjogador, int coluna, int linha, char *sentido)
 {
 
+    int linhaigual = 0;
+    for (int value = linha - 4; value <= linha + 4; value++)
+    {
+        if (linha > 19)
+            break;
+        if (linha > -1)
+        {
+            if (Ativo[0].Tabuleiro[coluna][value] == numjogador)
+                linhaigual++;
+            else
+                linhaigual = 0;
+
+            if (linhaigual == 4)
+            {
+                printf("Acabou o jogo\n");
+                break;
+            }
+        }
+    }
+
+    for (int value = coluna - 4; value <= coluna + 4; value++)
+    {
+        if (coluna > 19)
+            break;
+
+        if (coluna > -1)
+        {
+            if (Ativo[0].Tabuleiro[value][linha] == numjogador)
+                linhaigual++;
+            else
+                linhaigual = 0;
+
+            if (linhaigual == 4)
+            {
+                printf("Acabou o jogo\n");
+                break;
+            }
+        }
+    }
+
+    for (int value = -4; value <= 4; value++)
+    {
+        if (coluna + value > 19 & linha + value > 19)
+            break;
+        if (coluna + value > -1 && linha + value > -1)
+        {
+            if (Ativo[0].Tabuleiro[coluna + value][linha + value] == numjogador)
+                linhaigual++;
+            else
+                linhaigual = 0;
+
+            if (linhaigual == 4)
+            {
+                printf("Acabou o jogo\n");
+                break;
+            }
+        }
+    }
+    for (int value = 0; value <= 6; value++)
+    {
+        if (Ativo[0].Tabuleiro[coluna - value][linha - value] == numjogador)
+            linhaigual++;
+        else
+            linhaigual = 0;
+
+        if (linhaigual == 3)
+        {
+            printf("Acabou o jogo\n");
+            break;
+        }
+    }
+}
+
+char *ColocarPeca(int numbjogador, int coluna, char *sentido, int tamanhopeca)
+{
+
+    // int col = strcmp(sentido, "D") == 0 : col = (sizeof tabuleiro / sizeof tabuleiro[0][0])-coluna : col = coluna;
+    int col = -1;
+    if (strcmp(sentido, "D") == 0)
+        col = 20 - coluna;
+    else
+        col = coluna;
+    int linha = -1;
+    for (int count = 19; count < 20; count--)
+        if (Ativo[0].Tabuleiro[col][count] == -1 || Ativo[0].Tabuleiro[col][count] == 0)
+        {
+            Ativo[0].Tabuleiro[col][count] = numbjogador;
+            linha = count;
+            break;
+        }
+
+    bool s = CheckWin(numbjogador, col, linha, sentido);
+}
+
+void switchcase(char *linha)
+{
 
     char *comando = strtok(linha, " "); //.Split(new string [] {""}, none);
     if (strcmp(comando, "RJ") == 0)     // strcmp irá comparar o primeiro espaçamento com IJ, se for verdade retorna 0
@@ -119,7 +216,20 @@ void switchcase(char *linha)
     }
     else if (strcmp(comando, "CP") == 0)
     {
-        // Colocar Peça
+        char *jogador = strtok(NULL, " ");
+        int tamanho = atoi(strtok(NULL, " "));
+        int coluna = atoi(strtok(NULL, " "));
+        char *sentido = strtok(NULL, " ");
+
+        /*int numb = strcmp(jogador,Jogador1)==0 ? numb = 0 : numb = 1;*/
+        int numb = 0;
+
+        if (strcmp(jogador, Ativo[0].Jogador0) == 0)
+            numb = 0;
+        else
+            numb = 1;
+
+        ColocarPeca(numb, coluna, sentido, tamanho);
     }
     else if (strcmp(comando, "VR") == 0)
     {
