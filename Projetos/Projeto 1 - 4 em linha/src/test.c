@@ -57,8 +57,9 @@ char *EJ(char *Nome, LstGame gam)
     if (index != -1)
     {
         for (int count = index; count < gam->LenghPlayers; count++)
-           gam->Jogadores[count] = gam->Jogadores[gam->LenghPlayers + 1];
+            gam->Jogadores[count] = gam->Jogadores[gam->LenghPlayers + 1];
 
+        realloc(gam->Jogadores, sizeof(LstJogador) * gam->LenghPlayers-1);
         return "Jogador removido com sucesso.";
     }
     else
@@ -72,7 +73,7 @@ char *EJ(char *Nome, LstGame gam)
 
 bool LJ(LstGame gam)
 {
-    if (gam->Jogadores[0]->Nome == 0x0)
+    if (gam->LenghPlayers == 0)
         return false;
     for (int count = 0; count < gam->LenghPlayers - 1; count++)
         if (gam->Jogadores[count]->Nome != 0x0)
@@ -168,7 +169,7 @@ bool CheckWin(int numjogador, int coluna, int linha, char *sentido, LstGame gam)
     }
 }
 
-char *ColocarPeca(int numbjogador, int coluna, char *sentido, int tamanhopeca, LstGame gam)
+char *CP(int numbjogador, int coluna, char *sentido, int tamanhopeca, LstGame gam)
 {
     char *v = strtok(("%s", gam->dimensao), ",");
     int col = (strcmp(sentido, "D") == 0) ? coluna : (coluna - (atoi(strtok(NULL, ","))));
@@ -190,40 +191,65 @@ char *ColocarPeca(int numbjogador, int coluna, char *sentido, int tamanhopeca, L
 
 int **sendboard(char *filename, LstGame gam)
 {
-    FILE *fp = fopen(filename, "r");
-
-    char line[40];
-    fgets(line, 40, fp);
-    int *w = atoi(strtok(line, ","));
-    int *h = atoi(strtok(NULL, ","));
-
-    gam->dimensao = "%cx%c", *w, *h;
-
-    int **board = malloc(sizeof(int *) * *w);
-
-    for (int i = 0; i < *w; i++)
-        board[i] = malloc(sizeof(int) * *h);
-
-    int board_line_size = *w * 3 + 1;
-    char *board_line = malloc(sizeof(char) * (board_line_size + 1));
-    int row = 0, col = 0;
-    while (fgets(board_line, board_line_size, fp))
+    if (filename != NULL)
     {
-        char *command = strtok(board_line, ",");
-        col = 0;
-        board[row][col] = atoi(command);
-        for (int col = 1; col < *w - 1; col++)
-            board[row][col] = atoi(strtok(NULL, ","));
+        FILE *fp = fopen(filename, "r");
 
-        row++;
+        char line[40];
+        fgets(line, 40, fp);
+        int w = atoi(strtok(line, ","));
+        int h = atoi(strtok(NULL, ","));
+
+        gam->dimensao = "%cx%c", w, h;
+
+        gam->Tabuleiro = malloc(sizeof(int *) * w);
+
+        for (int i = 0; i < w; i++)
+            gam->Tabuleiro[i] = malloc(sizeof(int) * h);
+
+        int board_line_size = w * 3 + 1;
+        char *board_line = malloc(sizeof(char) * (board_line_size + 1));
+        int lin = 0, col = 0;
+        while (fgets(board_line, board_line_size, fp))
+        {
+            char *command = strtok(board_line, ",");
+            lin = 0;
+            gam->Tabuleiro[col][lin] = atoi(command);
+            for (int lin = 1; lin < w - 1; lin++)
+                gam->Tabuleiro[col][lin] = atoi(strtok(NULL, ","));
+
+            col++;
+        }
+
+        free(board_line);
     }
+    else
+    {
+        int w = atoi(strtok(gam->dimensao, "x"));
+        int h = atoi(strtok(NULL, "x"));
 
-    free(board_line);
-    return board;
+        gam->Tabuleiro = malloc(sizeof(int *) * w);
+
+        for (int i = 0; i < w; i++)
+            gam->Tabuleiro[i] = malloc(sizeof(int) * h);
+
+        int board_line_size = w * 3 + 1;
+        char *board_line = malloc(sizeof(char) * (board_line_size + 1));
+        int lin = 0, col = 0;
+        for (int col = 0; col < h; col++)
+            for (int lin = 0; lin < w ; lin++)
+                gam->Tabuleiro[col][lin] = -1;
+
+        free(board_line);
+    }
 }
 
 void IJ()
 {
+    //comprimento >0
+    //altura tem de ter no minimo metade de 2 no maximo valor de comprimento
+    //numero de peças em linha tem de ser >0 e <=w
+    //PeçasEspeciais tem de ser inferior a numero de peças em linha.
 }
 
 void switchcase(char *linha, LstGame gam, LstJogador jog)
@@ -261,7 +287,10 @@ void switchcase(char *linha, LstGame gam, LstJogador jog)
     }
     else if (strcmp(comando, "IJ") == 0)
     {
-        // Iniciar Jogo
+        char * Nome1=strtok(NULL, " ");
+        char * Nome2=strtok(NULL, " ");
+        if(FindIndex(Nome1, gam)!=-1 && FindIndex(Nome2, gam)!=-1) 
+            IJ(gam, Nome1, Nome2);
     }
     else if (strcmp(comando, "CP") == 0)
     {
@@ -278,7 +307,7 @@ void switchcase(char *linha, LstGame gam, LstJogador jog)
         else
             numb = 1;
 
-        ColocarPeca(numb, coluna, sentido, tamanho, gam);
+        CP(numb, coluna, sentido, tamanho, gam);
     }
     else if (strcmp(comando, "VR") == 0)
     {
@@ -321,7 +350,7 @@ int main()
         size_t len = 0;                // É um "long", que conta bytes
         getline(&line, &len, stdin);   // geline() -> função para recolher texto stdin -> é um ponteiro do tipo FILE *
         line[strlen(line) - 1] = '\0'; // remover o \n
-        switchcase(line, &game, &player);
+        switchcase(line, game, player);
     }
     return 0;
 }

@@ -24,7 +24,7 @@ int **read_board(char *filename, int *w, int *h)
     }
     
     int board_line_size = width * 3 + 1;//comprimento x 3 (porque o maximo de caracteres por linha da coluna são 3 (-1,)) + 1 (por causa do \n)
-    char *board_line = malloc(sizeof(char) * ( board_line_size + 1));//?
+    char *board_line = malloc(sizeof(char) * ( board_line_size + 1));//\0
     int row = 0, col = 0; // inteiro para ser a posição exato da linha e coluna
     while (fgets(board_line, board_line_size , fp))// vê o ficheiro na variavel fp, com o tamanho da boardline e lê contantemente o ficheiro linha por linha
     {
