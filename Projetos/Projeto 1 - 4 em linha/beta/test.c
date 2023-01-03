@@ -399,22 +399,22 @@ void switchcase(char *linha, LstGame gam, LstJogador jog)
 
 int main()
 {
-    LstJogador player = malloc(sizeof(jogador));
+    LstJogador player = (LstJogador)malloc(sizeof(jogador));
     player->Nome = NULL;
     player->Vitoria = -1;
     player->Jogadas = -1;
-    LstGame game = malloc(sizeof(game));
-    game->Jogadores = NULL;
-    game->LenghPlayers = 0;
+    LstGame gam = (LstGame)malloc(sizeof(game));
+    gam->Jogadores = NULL;
+    gam->LenghPlayers = 0;
 
-    reset_game(game);
+    reset_game(gam);
     while (true)
     {
         char *line = NULL;             // variavel string apontador
         size_t len = 0;                // É um "long", que conta bytes
         getline(&line, &len, stdin);   // geline() -> função para recolher texto stdin -> é um ponteiro do tipo FILE *
         line[strlen(line) - 1] = '\0'; // remover o \n
-        switchcase(line, game, player);
+        switchcase(line, gam, player);
     }
     return 0;
 }
