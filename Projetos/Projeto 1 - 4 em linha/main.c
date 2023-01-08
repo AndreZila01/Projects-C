@@ -5,26 +5,54 @@
 
 typedef struct
 {
-    char *Nome;
-    int Vitoria;
-    int Jogadas;
+    char *Nome; //Nome de Jogadores
+    int Vitoria; //Vitorias do Jogador
+    int Jogadas; //Numero de Jogadas do Jogador
 } jogador, *LstJogador;
 
 typedef struct
 {
-    LstJogador *Jogadores;
-    int **Tabuleiro;
-    char *TamanhoPeca;
+    LstJogador *Jogadores; // Struct ligado ao LstJogador
+    int **Tabuleiro; // Matriz do tabuleiro de inteiros
     int DimensoesTabuleiro[2]; // linhas x colunas
-    char *PecEspecial[2];
+    int *PecEspecial[2]; //As peças especiais de cada jogador
     int Sequencia; // Tamanho de sequencia
-    char *Nome[2];
-    int LenghPlayers;
+    char *Nome[2]; //Nome dos dois jogadores
+    int LenghPlayers; //Quantos Jogadores estão no *Jogadores
     bool EstadoJogo; // false - Por Inciar || true - A decorrer
 } game, *LstGame;
 
-// FALTA TURNO NO JOGO
+void reset_game(LstGame game)
+{
+    game->Tabuleiro = NULL;
+    game->Nome[0] = NULL;
+    game->Nome[1] = NULL;
+    game->EstadoJogo = false;
+    game->DimensoesTabuleiro[0] = -1;
+    game->DimensoesTabuleiro[1] = -1;
+    game->Sequencia = 0;
+    game->PecEspecial[0] = NULL;
+    game->PecEspecial[1] = NULL;
+    free(game->PecEspecial[1]);
+    free(game->PecEspecial[0]);
+}
 
+void Sort(LstGame gam)
+{
+    char temp[101];
+    for (int i = 0; i < gam->LenghPlayers; i++)
+    {
+        for (int j = i + 1; j < gam->LenghPlayers; j++)
+        {
+            if (strcmp(gam->Jogadores[i]->Nome, gam->Jogadores[j]->Nome) > 0)
+            {
+                strcpy(temp, gam->Jogadores[i]->Nome);
+                strcpy(gam->Jogadores[i]->Nome, gam->Jogadores[j]->Nome);
+                strcpy(gam->Jogadores[j]->Nome, temp);
+            }
+        }
+    }
+}
 bool RJ(char *Name, LstGame gam)
 {
     for (int count = 0; count < gam->LenghPlayers; count++)
@@ -55,23 +83,6 @@ int FindIndex(char *Nome, LstGame gam)
     return -1;
 }
 
-void Sort(LstGame gam)
-{
-    char *temp[101];
-    for (int i = 0; i < gam->LenghPlayers; i++)
-    {
-        for (int j = i + 1; j < gam->LenghPlayers; j++)
-        {
-            if (strcmp(gam->Jogadores[i]->Nome, gam->Jogadores[j]->Nome) > 0)
-            {
-                strcpy(temp, gam->Jogadores[i]->Nome);
-                strcpy(gam->Jogadores[i]->Nome, gam->Jogadores[j]->Nome);
-                strcpy(gam->Jogadores[j]->Nome, temp);
-            }
-        }
-    }
-}
-
 char *EJ(char *Nome, LstGame gam)
 {
     int index = FindIndex(Nome, gam);
@@ -80,15 +91,11 @@ char *EJ(char *Nome, LstGame gam)
         for (int count = index; count < gam->LenghPlayers; count++)
             gam->Jogadores[count] = gam->Jogadores[gam->LenghPlayers + 1];
 
-        realloc(gam->Jogadores, sizeof(LstJogador) * gam->LenghPlayers - 1);
+        gam->Jogadores = realloc(gam->Jogadores, sizeof(LstJogador) * gam->LenghPlayers - 1);
         return "Jogador removido com sucesso.";
     }
     else
         return "Jogador não existente.\n";
-
-    //  -> Se Remover com sucesso imprime, "Jogador removido com sucesso.";
-    //-> Se o jogador não existir imprimir, "Jogador não existente";
-    //-> Se jogador está a participar num jogo em curso imprime, "Jogador participa no jogo em curso.";
 }
 
 bool LJ(LstGame gam)
@@ -122,20 +129,6 @@ void D(char *Utilizador, LstGame gam)
             reset_game(gam);
         }
     }
-}
-
-void reset_game(LstGame game)
-{
-    game->Tabuleiro = NULL;
-    game->Nome[0] = NULL;
-    game->Nome[1] = NULL;
-    game->EstadoJogo = false;
-    game->DimensoesTabuleiro[0] = -1;
-    game->DimensoesTabuleiro[1] = -1;
-    game->Sequencia = 0;
-    game->PecEspecial[0] = "0";
-    game->PecEspecial[1] = "0";
-    game->TamanhoPeca = NULL;
 }
 
 bool CheckWin(int numjogador, int coluna, int linha, char *sentido, LstGame gam)
@@ -221,19 +214,20 @@ bool CheckWin(int numjogador, int coluna, int linha, char *sentido, LstGame gam)
     }
 }
 
-char *CP(int numbjogador, int coluna, char *sentido, int tamanhopeca, LstGame gam)
+void CP(int numbjogador, int coluna, char *sentido, int tamanhopeca, LstGame gam)
 {
-    // char *v = strtok(("%s", gam->dimensao), ",");
     int col = (strcmp(sentido, "D") == 0) ? coluna : (coluna - (atoi(strtok(NULL, ","))));
 
     int linha = -1;
-    for (int count = 19; count < 20; count--)
+    for (int count = gam->DimensoesTabuleiro[1]; count >=0; count--) // Alterar estes valores
         if (gam->Tabuleiro[col][count] == -1 || gam->Tabuleiro[col][count] == 0)
         {
             gam->Tabuleiro[col][count] = numbjogador;
             linha = count;
             break;
         }
+
+    // Fazer Peças Especiais
 
     bool s = CheckWin(numbjogador, col, linha, sentido, gam);
 }
@@ -303,6 +297,7 @@ void IJ(LstGame gam, char *Nome1, char *Nome2)
 
         gam->DimensoesTabuleiro[0] = atoi(strtok(lineIJ, " "));
         gam->DimensoesTabuleiro[1] = atoi(strtok(NULL, " "));
+        gam->Sequencia = atoi(strtok(NULL, " "));
         if (gam->DimensoesTabuleiro[0] > 0 && gam->DimensoesTabuleiro[1] <= gam->DimensoesTabuleiro[0] && gam->DimensoesTabuleiro[1] >= (gam->DimensoesTabuleiro[0] / 2))
         {
             if (gam->Sequencia > 0 && gam->Sequencia < gam->DimensoesTabuleiro[0])
@@ -315,28 +310,27 @@ void IJ(LstGame gam, char *Nome1, char *Nome2)
 
                 token = strtok(line, " ");
 
-                int values = NULL;
-                int value = 0;
+                int *values = NULL;
+                int num_values = 0;
                 while (token != NULL)
                 {
                     if (atoi(token) > 0 && gam->Sequencia > atoi(token))
                     {
-                        if (values == NULL)
-                            values = (int *)malloc(sizeof(int) * 1);
-                        else
-                            values = realloc(values, sizeof(values) * value);
+                        num_values++;
+                        values = realloc(values, sizeof(int) * num_values);
 
-                        values[value] = atoi(token);
-                        value++;
+                        values[num_values - 1] = atoi(token);
                     }
                     else
                         printf("Dimensões de peças especiais inválidas.");
                     token = strtok(NULL, " ");
                 }
-                if (value != 0)
+                if (num_values != 0)
                 {
-                    gam->Sequencia[1] = values;
-                    gam->Sequencia[0] = values;
+                    gam->PecEspecial[1] = malloc(sizeof(int) * num_values);
+                    memcpy(gam->PecEspecial[1], values, sizeof(int) * num_values);
+                    gam->PecEspecial[0] = malloc(sizeof(int) * num_values);
+                    memcpy(gam->PecEspecial[0], values, sizeof(int) * num_values);
                 }
                 printf("Jogo iniciado entre %s e %s", gam->Nome[0], gam->Nome[1]);
             }
@@ -381,7 +375,7 @@ void VR(LstGame gam)
 
 void Gravar(LstGame gam)
 {
-    FILE *fp = fopen("", "w");
+    FILE *fp = fopen("Backup.txt", "w");
     fprintf(fp, "%d\n", gam->LenghPlayers);
     for (int i = 0; i < gam->LenghPlayers; i++)
     {
@@ -403,13 +397,51 @@ void Gravar(LstGame gam)
             }
         }
         fprintf(fp, "%d,%d\n", FindIndex(gam->Nome[0], gam), FindIndex(gam->Nome[1], gam));
-        //PEÇAS ESPECIAIS FALTA
+        // PEÇAS ESPECIAIS FALTA
     }
     fclose(fp);
 }
 
-void Ler(LstGame game, LstJogador pla){
+void Ler(LstGame game, LstJogador pla)
+{
+    FILE *fp = fopen("Backup.txt", "r"); // abrir o ficheiro e "ler"
 
+    if (fp != NULL)
+    {
+        char line[40];
+        fgets(line, 40, fp);
+        char *command = strtok(line, ",");
+        game->DimensoesTabuleiro[0] = atoi(command);
+        command = strtok(NULL, ",");
+        game->DimensoesTabuleiro[1] = atoi(command);
+        game->Tabuleiro = malloc(sizeof(int *) * game->DimensoesTabuleiro[0]); // crias um array dinamico de apontadores 8 bytes * comprimento
+
+        for (int i = 0; i < game->DimensoesTabuleiro[0]; i++) //**não devia ser height**
+        {
+            game->Tabuleiro[i] = malloc(sizeof(int) * game->DimensoesTabuleiro[1]); // multiplica o inteiro (4bytes) * tamanho, o que irá dar o espaço necessário para guardar todos os 0, 1, -1
+            //**não devia ser int * **
+        }
+
+        int board_line_size = game->DimensoesTabuleiro[0] * 3 + 1;       // comprimento x 3 (porque o maximo de caracteres por linha da coluna são 3 (-1,)) + 1 (por causa do \n)
+        char *board_line = malloc(sizeof(char) * (board_line_size + 1)); //\0
+        int row = 0, col = 0;                                            // inteiro para ser a posição exato da linha e coluna
+        while (fgets(board_line, board_line_size, fp))                   // vê o ficheiro na variavel fp, com o tamanho da boardline e lê contantemente o ficheiro linha por linha
+        {
+            command = strtok(board_line, ",");
+            game->Tabuleiro[row][col] = atoi(command);
+            col++;
+            for (col = 1; col < game->DimensoesTabuleiro[0] - 1; col++)
+            {
+                command = strtok(NULL, ",");
+                game->Tabuleiro[row][col] = atoi(command);
+            }
+            row++;
+        }
+
+        free(board_line); // apaga os dados que estão na ram?
+
+        fclose(fp); // fecha a ligação do ficheiro
+    }
 }
 
 void switchcase(char *linha, LstGame gam, LstJogador jog)
@@ -467,16 +499,11 @@ void switchcase(char *linha, LstGame gam, LstJogador jog)
     }
     else if (strcmp(comando, "G") == 0)
     {
-        Gravar(gam, jog);
+        Gravar(gam);
     }
     else if (strcmp(comando, "L") == 0)
     {
-        FILE *fp;
-        char *buff;
-        fp = fopen("fprintf_test.txt", "r");
-        fgets(buff, 100000, (FILE *)fp);
-        printf("%s\n", buff);
-        fclose(fp);
+        Ler(gam, jog);
     }
     else
         printf("O valor inserido nao tem correspondencia.\n");
