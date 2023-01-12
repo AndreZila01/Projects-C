@@ -26,14 +26,16 @@ typedef struct
 void reset_game(LstGame game)
 {
     game->Tabuleiro = NULL;
-    game->Nome[0] = NULL;
-    game->Nome[1] = NULL;
+    free(game->Nome[0]);
+    free(game->Nome[1]);
     game->EstadoJogo = false;
     game->DimensoesTabuleiro[0] = -1;
     game->DimensoesTabuleiro[1] = -1;
     game->Sequencia = 0;
     game->PecEspecial[0] = NULL;
     game->PecEspecial[1] = NULL;
+    game->NumPecEspecial[0] = -1;
+    game->NumPecEspecial[1] = -1;
     free(game->PecEspecial[1]);
     free(game->PecEspecial[0]);
 }
@@ -45,11 +47,11 @@ void Sort(LstGame gam)
     {
         for (int j = i + 1; j < gam->LenghPlayers; j++)
         {
-            if (strcmp(gam->Jogadores[j]->Nome, gam->Jogadores[j+1]->Nome) > 0)
+            if (strcmp(gam->Jogadores[j]->Nome, gam->Jogadores[j + 1]->Nome) > 0)
             {
-                temp = gam->Jogadores[j]->Nome;
-                gam->Jogadores[j]->Nome = gam->Jogadores[j+1]->Nome;
-                gam->Jogadores[j+1]->Nome = temp;
+                temp = gam->Jogadores[j];
+                gam->Jogadores[j] = gam->Jogadores[j + 1];
+                gam->Jogadores[j + 1] = temp;
             }
         }
     }
@@ -103,10 +105,19 @@ bool LJ(LstGame gam)
 {
     if (gam->LenghPlayers == 0)
         return false;
-    for (int count = 0; count < gam->LenghPlayers - 1; count++)
+    for (int count = 0; count < gam->LenghPlayers; count++)
         if (gam->Jogadores[count]->Nome != 0x0)
             printf("%s %d %d\n", gam->Jogadores[count]->Nome, gam->Jogadores[count]->Jogadas, gam->Jogadores[count]->Vitoria);
     return true;
+}
+
+void GiveWin(int numjogador, LstGame gam)
+{
+    if (numjogador != -1)
+        gam->Jogadores[(FindIndex(gam->Nome[numjogador], gam))]->Vitoria++;
+    gam->Jogadores[(FindIndex(gam->Nome[0], gam))]->Jogadas++;
+    gam->Jogadores[(FindIndex(gam->Nome[1], gam))]->Jogadas++;
+    reset_game(gam);
 }
 
 void D(char *Utilizador, LstGame gam)
@@ -114,27 +125,20 @@ void D(char *Utilizador, LstGame gam)
     int idUtilizador = (FindIndex(Utilizador, gam));
     if (gam->EstadoJogo == false)
         printf("Não existe jogo em curso.");
-    else if ((gam->Nome[1] == Utilizador) || (gam->Nome[0] == Utilizador) && idUtilizador != -1)
+    else if ((strcmp(Utilizador, gam->Nome[0]) == 0 || strcmp(Utilizador, gam->Nome[1])== 0)  && idUtilizador != -1)
     {
-        if (strcmp(Utilizador, gam->Nome[0]) == 0 && strcmp(Utilizador, gam->Nome[1]) == 0)
-        {
-            // O outro jogador regista uma vitória e ambos registam mais um jogo jogado
-            if (strcmp(Utilizador, gam->Nome[0]) == 0)
-                gam->Jogadores[FindIndex(gam->Nome[0], gam)]->Vitoria++;
-            else
-                gam->Jogadores[FindIndex(gam->Nome[1], gam)]->Vitoria++;
+        // O outro jogador regista uma vitória e ambos registam mais um jogo jogado
+        // Os dois utilizadores podem perder
+        int numjogador = strcmp(gam->Nome[0], Utilizador) == 0 ? 0 : 1;
+        GiveWin(numjogador, gam);
 
-            gam->Jogadores[FindIndex(gam->Nome[1], gam)]->Jogadas++;
-            gam->Jogadores[FindIndex(gam->Nome[0], gam)]->Jogadas++;
-            printf("Desistência com sucesso. Jogo terminado.\n");
-            reset_game(gam);
-        }
+        printf("Desistência com sucesso. Jogo terminado.\n");
+        reset_game(gam);
     }
 }
 
-bool CheckWin(int numjogador, int coluna, int linha, char *sentido, LstGame gam)
+bool CheckWin(int numjogador, int coluna, int linha, LstGame gam)
 {
-
     int linhaigual = 0;
     for (int value = linha - gam->Sequencia; value <= linha + gam->Sequencia; value++)
     {
@@ -152,6 +156,7 @@ bool CheckWin(int numjogador, int coluna, int linha, char *sentido, LstGame gam)
             if (linhaigual == gam->Sequencia)
             {
                 printf("Acabou o jogo\n");
+                GiveWin(numjogador, gam);
                 break;
             }
         }
@@ -173,6 +178,7 @@ bool CheckWin(int numjogador, int coluna, int linha, char *sentido, LstGame gam)
             if (linhaigual == gam->Sequencia)
             {
                 printf("Acabou o jogo\n");
+                GiveWin(numjogador, gam);
                 break;
             }
         }
@@ -194,6 +200,7 @@ bool CheckWin(int numjogador, int coluna, int linha, char *sentido, LstGame gam)
             if (linhaigual == gam->Sequencia)
             {
                 printf("Acabou o jogo\n");
+                GiveWin(numjogador, gam);
                 break;
             }
         }
@@ -210,6 +217,7 @@ bool CheckWin(int numjogador, int coluna, int linha, char *sentido, LstGame gam)
         if (linhaigual == gam->Sequencia)
         {
             printf("Acabou o jogo\n");
+            GiveWin(numjogador, gam);
             break;
         }
     }
@@ -232,14 +240,16 @@ bool CheckPecaEspecial(LstGame gam, int tamanho, int numb)
     //         printf("Dimensões de peças especiais inválidas.");
     //     token = strtok(NULL, " ");
     // }
-    for(int i = 0; i < gam->NumPecEspecial[numb]; i++){
-        if(gam->PecEspecial[numb][i] == tamanho) {
+    for (int i = 0; i < gam->NumPecEspecial[numb]; i++)
+    {
+        if (gam->PecEspecial[numb][i] == tamanho)
+        {
             // Exemplo:
             // Remover peça especial na posição 1
             // [2,3,3,4] -> [2,3,4,4]
             // i = 1
-            memcpy(game->PecEspecial[numb][i], game->PecEspecial[numb][i+1], (game->NumPecEspecial[numb] - i - 1) * sizeof(int))
-            game->NumPecEspecial[numb]--;
+            memmove(&(gam->PecEspecial[numb][i]), &(gam->PecEspecial[numb][i + 1]), (gam->NumPecEspecial[numb] - i - 1) * sizeof(int));
+            gam->NumPecEspecial[numb]--;
             // TODO: fazer realloc depois de mover o array
             return true;
         }
@@ -249,12 +259,13 @@ bool CheckPecaEspecial(LstGame gam, int tamanho, int numb)
 
 void CP(int numbjogador, int coluna, char *sentido, int tamanhopeca, LstGame gam)
 {
-    int poscol = (strcmp(sentido, "D") == 0) ? coluna : (coluna - (atoi(strtok(NULL, ",")))) - tamanhopeca;
+    int poscol = (strcmp(sentido, "D") == 0) ? coluna : (gam->DimensoesTabuleiro[1] - coluna) - tamanhopeca;
 
     if (CheckPecaEspecial(gam, tamanhopeca, numbjogador))
     {
-        for (int col = 0; col < tamanhopeca; col++)
-            for (int linha = gam->DimensoesTabuleiro[1]; linha >= 0; linha--) // Alterar estes valores
+        int col = 0, linha = 0;
+        for (col = 0; col < tamanhopeca; col++)
+            for (linha = gam->DimensoesTabuleiro[1]; linha >= 0; linha--) // Alterar estes valores
                 if (gam->Tabuleiro[col + poscol][linha] == -1)
                 {
                     gam->Tabuleiro[col + poscol][linha] = numbjogador;
@@ -262,7 +273,7 @@ void CP(int numbjogador, int coluna, char *sentido, int tamanhopeca, LstGame gam
                     break;
                 }
 
-        bool s = CheckWin(numbjogador, col, linha, sentido, gam);
+        bool s = CheckWin(numbjogador, col, linha, gam);
     }
 }
 
@@ -329,8 +340,6 @@ void IJ(LstGame gam, char *Nome1, char *Nome2)
         size_t lenIJ = 0;
         getline(&lineIJ, &lenIJ, stdin);
         lineIJ[strlen(lineIJ) - 1] = '\0';
-        if (strlen(lineIJ) == 0)
-            break;
 
         gam->DimensoesTabuleiro[0] = atoi(strtok(lineIJ, " "));
         gam->DimensoesTabuleiro[1] = atoi(strtok(NULL, " "));
@@ -340,8 +349,6 @@ void IJ(LstGame gam, char *Nome1, char *Nome2)
         size_t len = 0;
         getline(&line, &len, stdin);
         line[strlen(line) - 1] = '\0';
-        if (strlen(line) == 0)
-            break;
 
         char *token;
         token = strtok(line, " ");
@@ -365,10 +372,10 @@ void IJ(LstGame gam, char *Nome1, char *Nome2)
         {
             gam->PecEspecial[1] = malloc(sizeof(int) * num_values);
             memcpy(gam->PecEspecial[1], values, sizeof(int) * num_values);
-            game->NumPecEspecial[1] = num_values;
+            gam->NumPecEspecial[1] = num_values;
             gam->PecEspecial[0] = malloc(sizeof(int) * num_values);
             memcpy(gam->PecEspecial[0], values, sizeof(int) * num_values);
-            game->NumPecEspecial[0] = num_values;
+            gam->NumPecEspecial[0] = num_values;
         }
 
         if (!(gam->Sequencia > 0 && gam->Sequencia < gam->DimensoesTabuleiro[0]))
@@ -523,13 +530,12 @@ void switchcase(char *linha, LstGame gam, LstJogador jog)
         int coluna = atoi(strtok(NULL, " "));
         char *sentido = strtok(NULL, " ");
 
-        /*int numb = strcmp(jogador,Jogador1)==0 ? numb = 0 : numb = 1;*/
-        int numb = 0;
-
+        int numb = strcmp(jogador, gam->Nome[0]) == 0 ? 0 : 1;
+        /*int numb = 0;
         if (strcmp(jogador, gam->Nome[0]) == 0)
             numb = 0;
         else
-            numb = 1;
+            numb = 1;*/
 
         CP(numb, coluna, sentido, tamanho, gam);
     }
@@ -544,6 +550,10 @@ void switchcase(char *linha, LstGame gam, LstJogador jog)
     else if (strcmp(comando, "L") == 0)
     {
         Ler(gam, jog);
+    }
+    else if (strcmp(comando, "DJ") == 0)
+    {
+        // FAZER DJ
     }
     else
         printf("O valor inserido nao tem correspondencia.\n");
