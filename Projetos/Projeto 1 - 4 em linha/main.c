@@ -141,7 +141,6 @@ void D(char *Utilizador1, char *Utilizador2, LstGame gam)
             int numjogador = strcmp(gam->Nome[0], Utilizador1) == 0 ? 0 : 1;
             if (Utilizador2 != NULL)
                 numjogador = -1;
-            if (strcmp(gam->Nome[0], Utilizador1) == 0)
                 GiveWin(numjogador, gam);
 
             printf("Desistência com sucesso. Jogo terminado.\n");
@@ -170,7 +169,7 @@ bool CheckWin(int numjogador, int coluna, int linha, LstGame gam)
                 linhaigual = 0;
                 break;
             }
-            if (gam->Tabuleiro[value][coluna] == numjogador)
+            else if (gam->Tabuleiro[value][coluna] == numjogador)
                 linhaigual++;
             else
                 linhaigual = 0;
@@ -193,7 +192,7 @@ bool CheckWin(int numjogador, int coluna, int linha, LstGame gam)
                 linhaigual = 0;
                 break;
             }
-            if (gam->Tabuleiro[linha][value] == numjogador)
+            else if (gam->Tabuleiro[linha][value] == numjogador)
                 linhaigual++;
             else
                 linhaigual = 0;
@@ -214,7 +213,7 @@ bool CheckWin(int numjogador, int coluna, int linha, LstGame gam)
             linhaigual = 0;
             break;
         }
-        if (coluna + value > -1 && linha + value > -1)
+        else if (coluna + value > -1 && linha + value > -1)
         {
             if (gam->Tabuleiro[linha + value][coluna + value] == numjogador)
                 linhaigual++;
@@ -234,7 +233,7 @@ bool CheckWin(int numjogador, int coluna, int linha, LstGame gam)
             linhaigual = 0;
             break;
         }
-        if (gam->Tabuleiro[linha - value][coluna - value] == numjogador)
+        else if (gam->Tabuleiro[linha - value][coluna - value] == numjogador)
             linhaigual++;
         else
             linhaigual = 0;
@@ -242,6 +241,7 @@ bool CheckWin(int numjogador, int coluna, int linha, LstGame gam)
         if (linhaigual == gam->Sequencia)
             return true;
     }
+    return false;
 }
 
 bool CheckPecaEspecial(LstGame gam, int tamanho, int numb)
@@ -264,12 +264,12 @@ void CP(int numbjogador, int coluna, char *sentido, int tamanhopeca, LstGame gam
     if (gam->EstadoJogo == false)
         printf("Não existe jogo em curso.\n");
 
-    int poscol = (strcmp(sentido, "E") == 0) ? coluna - tamanhopeca : coluna;
+    int poscol = (sentido != NULL && strcmp(sentido[0], "E") == 0) ? coluna - tamanhopeca : coluna;
     poscol--;
 
     if (poscol < 0 && poscol > gam->DimensoesTabuleiro[0])
         printf("Posição irregular.");
-    else if (CheckPecaEspecial(gam, tamanhopeca, numbjogador))
+    else if (CheckPecaEspecial(gam, tamanhopeca, numbjogador) || tamanhopeca == 1)
     {
         int col = 0, linha = 0;
         for (linha = 0; linha < tamanhopeca; linha++)
@@ -375,7 +375,7 @@ void IJ(LstGame gam, char *Nome1, char *Nome2)
         int num_values = 0;
         while (token != NULL)
         {
-            if (atoi(token) > 0 && gam->Sequencia > atoi(token))
+            if (atoi(token) > 1 && gam->Sequencia > atoi(token))
             {
                 num_values++;
                 values = realloc(values, sizeof(int) * num_values);
@@ -409,8 +409,8 @@ void IJ(LstGame gam, char *Nome1, char *Nome2)
             int board_line_size = gam->DimensoesTabuleiro[0] * 3 + 1;
             char *board_line = malloc(sizeof(char) * (board_line_size + 1));
 
-            for (int col = 1; col < gam->DimensoesTabuleiro[1] - 1; col++)
-                for (int lin = 1; lin < gam->DimensoesTabuleiro[0] - 1; lin++)
+            for (int col = 0; col < gam->DimensoesTabuleiro[1]; col++)
+                for (int lin = 0; lin < gam->DimensoesTabuleiro[0]; lin++)
                     gam->Tabuleiro[lin][col] = -1;
         }
 
