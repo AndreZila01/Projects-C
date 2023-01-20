@@ -226,9 +226,9 @@ bool CheckWin(int numjogador, int coluna, int linha, LstGame gam)
     }
     for (int value = 0; value <= gam->Sequencia; value++)
     {
-        if (value < 0)
-            value = 0;
-        if (linha + value >= gam->DimensoesTabuleiro[0] || coluna + value >= gam->DimensoesTabuleiro[1])
+        if (linha - value < 0 || coluna - value<0)
+            break;
+        if (linha - value >= gam->DimensoesTabuleiro[0] || coluna - value >= gam->DimensoesTabuleiro[1])
         {
             linhaigual = 0;
             break;
@@ -264,8 +264,7 @@ void CP(int numbjogador, int coluna, char *sentido, int tamanhopeca, LstGame gam
     if (gam->EstadoJogo == false)
         printf("Não existe jogo em curso.\n");
 
-    int poscol = (sentido != NULL && strcmp(sentido[0], "E") == 0) ? coluna - tamanhopeca : coluna;
-    poscol--;
+    int poscol = (sentido != NULL && strcmp(sentido, "E") == 0) ? coluna - tamanhopeca : coluna;
 
     if (poscol < 0 && poscol > gam->DimensoesTabuleiro[0])
         printf("Posição irregular.");
@@ -343,6 +342,7 @@ int **sendboard(char *filename, LstGame gam)
 
         free(board_line);
     }
+    return 0;
 }
 
 void IJ(LstGame gam, char *Nome1, char *Nome2)
@@ -618,23 +618,21 @@ void printDJ(LstGame gam, int jogador)
 int DJ(LstGame gam)
 {
     if (gam->EstadoJogo == false)
+    {
+        printf("Não existe jogo em curso.\n");
         return 0;
-    printf("%d %d\n", gam->DimensoesTabuleiro[0], gam->DimensoesTabuleiro[1]);
-    int jogador = 0;
-
-    if (strcmp(gam->Nome[0], gam->Nome[1]) > 0)
-        jogador = 0;
+    }
     else
-        jogador = 1;
-    printf("\n");
-    printDJ(gam, jogador);
-
-    if (strcmp(gam->Nome[0], gam->Nome[1]) < 0)
-        jogador = 0;
-    else
-        jogador = 1;
-
-    printDJ(gam, jogador);
+    {
+        printf("Comprimento: %d Altura: %d\n", gam->DimensoesTabuleiro[0], gam->DimensoesTabuleiro[1]);
+        for (int i = 0; i < 2; i++)
+        {
+            printf("%s\n", gam->Nome[i]);
+            for (int j = 0; j < gam->NumPecEspecial[i]; j++)
+                printf("%d %d\n", gam->PecEspecial[i][j], gam->NumPecEspecial[i]);
+        }
+        return 1;
+    }
 }
 
 void switchcase(char *linha, LstGame gam)
