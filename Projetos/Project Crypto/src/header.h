@@ -32,13 +32,12 @@ char *ReadFile()
     LstCrypto cryp = realloc(NULL, sizeof(Crypto));
 
     FILE *fp = fopen("btc.txt", "r");
-    char line[1000];
+    const char line[1000];
 
     while (fgets(line, sizeof(line), fp) != NULL)
     {
         int value=0;
             printf("%s", line);
-            //strcmp(comando, "EJ") == 0
         if (strcmp(strtok(line, ";"), "Date"))
         {
             cryp->date = strtok(line, ";");

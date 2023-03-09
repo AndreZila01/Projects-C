@@ -6,6 +6,7 @@
 
 int main()
 {
-    if(CheckFile())
+    if(CheckFile()){
         ReadFile();
+        }
 }
