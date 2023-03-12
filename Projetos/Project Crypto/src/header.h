@@ -5,51 +5,66 @@
 
 typedef struct
 {
-    char *date;
+    int Dia;
+    int Mes;
+    int Ano;
+} Date, *LstDate;
+
+typedef struct
+{
+    Date date;
     float open;
     float high;
     float low;
     float close;
     long long Volume;
-    char *MarketCap;
+    double MarketCap;
 } Crypto, *LstCrypto;
 
-bool CheckFile()
+bool CheckFile(FILE *filename)
 {
-    FILE *fp = fopen("btc.txt", "r");
-
-    if (fp != NULL)
-    {
-        fclose(fp);
+    if (filename != NULL)
         return true;
-    }
     else
         return false;
 }
 
-char *ReadFile()
+Date atodate(char *dateS){
+    LstDate date = realloc(NULL, sizeof(Date));
+
+    date->Ano = atoi(strtok(dateS, "-"));
+    date->Mes = atoi(strtok(NULL, "-"));
+    date->Dia = atoi(strtok(NULL, "-"));
+
+    return *date;
+}
+
+void ReadFile(FILE *filename)
 {
-    LstCrypto cryp = realloc(NULL, sizeof(Crypto));
+    char line[1000];
 
-    FILE *fp = fopen("btc.txt", "r");
-    const char line[1000];
-
-    while (fgets(line, sizeof(line), fp) != NULL)
+    fgets(line, sizeof(line), filename);
+    LstCrypto Lstcry = realloc(NULL, sizeof(Crypto));
+    
+    int value = 0;
+    while (fgets(line, sizeof(line), filename) != NULL)
     {
-        int value=0;
-            printf("%s", line);
-        if (strcmp(strtok(line, ";"), "Date"))
-        {
-            cryp->date = strtok(line, ";");
-            cryp->open = atof(strtok(NULL, ";"));
-            cryp->high = atof(strtok(NULL, ";"));
-            cryp->low = atof(strtok(NULL, ";"));
-            cryp->close = atof(strtok(NULL, ";"));
-            cryp->Volume, atoll(strtok(NULL, ";"));
-            strcpy(cryp->MarketCap, strtok(NULL, ";"));
-            value++;
+        LstCrypto cryp = (LstCrypto)malloc(sizeof(Crypto));
+        printf("%s", line);
+        char* date=NULL;
 
-            cryp = realloc(cryp, sizeof(Crypto) * value);
-        }
+        date = strtok(line, ";");
+        cryp->open = atof(strtok(NULL, ";"));
+        cryp->high = atof(strtok(NULL, ";"));
+        cryp->low = atof(strtok(NULL, ";"));
+        cryp->close = atof(strtok(NULL, ";"));
+        cryp->Volume = atoll(strtok(NULL, ";"));
+        cryp->MarketCap = atof(strtok(NULL, ";"));
+        value++;
+        cryp->date = atodate(date);
+
+        Lstcry = realloc(Lstcry, sizeof(Crypto) * value);
+        Lstcry[value-1] = *cryp;
     }
+    free(cryp);
 }
