@@ -2,7 +2,6 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
-#include "bubble.h"
 
 typedef struct
 {
@@ -41,9 +40,11 @@ Date atodate(char *dateS)
     return *date;
 }
 
-int maior(LstCrypto Lstcry, int value);
-int menor(LstCrypto Lstcry, int value);
-int diferenca(LstCrypto Lstcry, int value);
+int compare_highest_close(void* a, void* b);
+int compare_lowest_close(void* a, void* b);
+void sort(void** records, int num_records, int (*cmp)(void*, void*));
+
+
 
 void ReadFile(FILE *filename)
 {
@@ -68,73 +69,52 @@ void ReadFile(FILE *filename)
         cryp->Volume = atoll(strtok(NULL, ";"));
         cryp->MarketCap = atof(strtok(NULL, ";"));
         value++;
+        //fazer a valorizacao
         soma += cryp->close;
         cryp->date = atodate(date);
 
         Lstcry = realloc(Lstcry, sizeof(Crypto) * value);
         Lstcry[value - 1] = *cryp;
     }
-    printf("A media do valor no fim do mês foi %d", (soma / (sizeof(Lstcry) / sizeof(Crypto))));
-    maior(Lstcry, value);
-    menor(Lstcry, value);
-    diferenca(Lstcry, value);
+    printf("A media do valor no fim do mês foi %ld", (soma/(sizeof(Lstcry) / sizeof(Crypto))));
+    sort(Lstcry, value, compare_highest_close);
+    sort(Lstcry, value, compare_lowest_close);
     free(Lstcry);
 }
 
-void maior(LstCrypto Lstcry, int value)
-{
-    int posicao[5] = {0, 1, 2, 3, 4};
-    BubbleSort(Lstcry, posicao);
-
-    for (int i = 4; i <= value; i++)
-    {
-        if (Lstcry[i].close > Lstcry[posicao[0]].close)
-            for (int index = 0; index > 5; index++)
-            {
-                if (Lstcry[i].close > Lstcry[posicao[index]].close)
-                {
-                    posicao[index] = i;
-                    BubbleSort(Lstcry, posicao);
-                }
-            }
-    }
-    printf("O maior preço é %f no dia %s\nO segundo maior preço é %f no dia %s\nO terceiro maior preço é %f no dia %s\nO quarto maior preço é %f no dia %s\nO quinto maior preço é %f no dia %s", Lstcry[posicao[0]].close, Lstcry[posicao[0]].date, Lstcry[posicao[1]].close, Lstcry[posicao[1]].date, Lstcry[posicao[2]].close, Lstcry[posicao[2]].date, Lstcry[posicao[3]].close, Lstcry[posicao[3]].date, Lstcry[posicao[4]].close, Lstcry[posicao[4]].date);
+int compare_highest_close(void* a, void* b) {
+    Crypto r1 = a;
+    Crypto r2 = b;
+    return r1->close - r2->close;
 }
 
-void maior(LstCrypto Lstcry, int value)
-{
-    int posicao[5] = {0, 1, 2, 3, 4};
-    BubbleSortM(Lstcry, posicao);
-    for (int i = 4; i <= value; i++)
-    {
-        if (Lstcry[i].close < Lstcry[posicao[4]].close)
-            for (int index = 0; index < 5; index++)
-            {
-                if (Lstcry[i].close < Lstcry[posicao[index]].close)
-                {
-                    posicao[index] = i;
-                    BubbleSort(Lstcry, posicao);
-                }
-            }
-    }
-    printf("O maior preço é %f no dia %s\nO segundo maior preço é %f no dia %s\nO terceiro maior preço é %f no dia %s\nO quarto maior preço é %f no dia %s\nO quinto maior preço é %f no dia %s", Lstcry[posicao[0]].close, Lstcry[posicao[0]].date, Lstcry[posicao[1]].close, Lstcry[posicao[1]].date, Lstcry[posicao[2]].close, Lstcry[posicao[2]].date, Lstcry[posicao[3]].close, Lstcry[posicao[3]].date, Lstcry[posicao[4]].close, Lstcry[posicao[4]].date);
+int compare_lowest_close(void* a, void* b) {
+    Crypto r1 = a;
+    Crypto r2 = b;
+    return r2.close - r1.close;
 }
 
-void diferenca(LstCrypto Lstcry, int value)
-{
-    int posicao[5] = {0, 1, 2, 3, 4};
-    BubbleSortm(Lstcry, posicao);
+int compare_dates(void* a, void* b) {
+    Crypto r1 =  a;
+    Crypto r2 =  b;
+    if(r1->date->Ano == r2->date->Ano) {
+        if(r1->date->mes == r2->date->mes) {
+            return r1->date->dia - r2->date->dia;
+        }
+        return r1->date->mes - r2->date->mes;
+    }
+    return r1->date->Ano - r2->date->Ano;
+}
 
-    for (int i = 4; i <= value; i++)
-    {
-        if (Lstcry[i].close < Lstcry[posicao[0]].close)
-            for (int index = 0; index < 5; index++)
-            {
-                if (Lstcry[i].close < Lstcry[posicao[index]].close)
-                {
-                    posicao[index] = i;
-                    BubbleSort(Lstcry, posicao);
-                }
+void sort(void** records, int num_records, int (*cmp)(void*, void*)) {
+    for(int i = 0; i < num_records; i++) {
+        for(int j = i + 1; j < num_records; j++) {
+            if(cmp(records[i], records[j]) > 0) {
+                void* tmp = records[i];
+                records[i] = records[j];
+                records[j] = tmp;
             }
+        }
     }
 }
+
