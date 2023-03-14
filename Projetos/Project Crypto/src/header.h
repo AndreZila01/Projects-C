@@ -19,6 +19,9 @@ typedef struct
     float close;
     long long Volume;
     double MarketCap;
+    double diferenca;
+    //double valorizacaoPU; no mes de jan, fev, mar, abr, mai, jun ...
+    double rendibilidade;
 } Crypto, *LstCrypto;
 
 bool CheckFile(FILE *filename)
@@ -43,7 +46,7 @@ Date atodate(char *dateS)
 int compare_highest_close(void* a, void* b);
 int compare_lowest_close(void* a, void* b);
 void sort(void** records, int num_records, int (*cmp)(void*, void*));
-
+void excel(LstCrypto v, int value);
 
 
 void ReadFile(FILE *filename)
@@ -68,8 +71,8 @@ void ReadFile(FILE *filename)
         cryp->close = atof(strtok(NULL, ";"));
         cryp->Volume = atoll(strtok(NULL, ";"));
         cryp->MarketCap = atof(strtok(NULL, ";"));
+        cryp->diferenca = (cryp->close-cryp->open);
         value++;
-        //fazer a valorizacao
         soma += cryp->close;
         cryp->date = atodate(date);
 
@@ -79,6 +82,8 @@ void ReadFile(FILE *filename)
     printf("A media do valor no fim do mês foi %ld", (soma/(sizeof(Lstcry) / sizeof(Crypto))));
     sort(Lstcry, value, compare_highest_close);
     sort(Lstcry, value, compare_lowest_close);
+    sort(Lstcry, value, compare_lowest_close);//maior diferença entre o fecho - abertura, ordena
+    excel(Lstcry, value);
     free(Lstcry);
 }
 
@@ -86,6 +91,11 @@ int compare_highest_close(void* a, void* b) {
     Crypto r1 = a;
     Crypto r2 = b;
     return r1->close - r2->close;
+}
+
+void printfmultipla(LstCrypto v){
+    for(int i=0; i<5; i++)
+        printf("Dia: %d-%d-%d\tClose: %f\tOpen: %f\t", v[i].date.Dia, v[i].date.Mes, v[i].date.Ano , v[i].close, v[i].open);
 }
 
 int compare_lowest_close(void* a, void* b) {
@@ -104,6 +114,10 @@ int compare_dates(void* a, void* b) {
         return r1->date->mes - r2->date->mes;
     }
     return r1->date->Ano - r2->date->Ano;
+}
+
+excel(void ** records, int value){
+    
 }
 
 void sort(void** records, int num_records, int (*cmp)(void*, void*)) {
