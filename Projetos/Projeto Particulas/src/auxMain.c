@@ -3,9 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "api.h"
-
-typedef struct List_ *List;
-typedef struct Node *Node;
+#include "Structs.h"
 
 List list_create()
 {
@@ -16,19 +14,21 @@ List list_create()
     return list;
 }
 
+bool CheckExistSameName(List a, char* b);
+
 void RegistarUser(char *user, List list)
 {
 
-    if (checkempty(list))
+    if (CheckEmpty(list))
         list = list_create();
 
-    if (checkexistsamename(list, *user))
+    if (CheckExistSameName(list, user))
     {
-        Node node = malloc(sizeof(struct Node));
+        Node node = malloc(sizeof(struct Node_));
         node->element = user;
         node->next = NULL;
 
-        if (checkempty(list))
+        if (CheckEmpty(list))
         {
             list->head = node;
             list->tail = node;
@@ -42,4 +42,21 @@ void RegistarUser(char *user, List list)
     }
     else
         printf("Utilizador existente.");
+}
+
+bool CheckExistSameName(List list, char* name)
+{
+    Node node = list->head;
+    int check = 0;
+    while (list->head != NULL)
+    {
+        if (CheckEqualString(node->element, name))
+            check++;
+
+        if (check == 2)
+            return true;
+
+        node = node->next;
+    }
+    return false;
 }

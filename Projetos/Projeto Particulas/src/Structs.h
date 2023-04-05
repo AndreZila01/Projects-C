@@ -1,3 +1,6 @@
+#ifndef Struct
+#define Struct
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -39,4 +42,6 @@ struct Particula
     float Vx;//velocidade em x
     float Vy;//velocidade em y
     float Vz;//velocidade em z
-}
+};
+
+#endif

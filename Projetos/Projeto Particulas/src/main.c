@@ -2,8 +2,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
-#include "auxMain.h"
-#include "Structs.c"
+#include "auxMain.c"
 
 
 
