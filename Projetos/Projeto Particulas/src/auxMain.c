@@ -16,6 +16,7 @@ List list_create()
 
 bool CheckExistSameName(List a, char *b);
 int CheckExistUser(List a, char *b);
+void* list_remove_first(List list);
 
 void RegistarUser(char *user, List list)
 {
@@ -119,4 +120,13 @@ void ListarJogador(List list)
         printf(node->element);
         node = node->next;
     }
+}
+
+void* list_remove_first(List list) {
+    
+    Node node = list->head;
+    list->head = node->next;
+    void* element = node->element;
+    free(node);
+    return element;
 }
