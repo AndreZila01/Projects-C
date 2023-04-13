@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 typedef struct Node_ *Node;
-typedef struct Particu *Particu;
+typedef struct NodeP_ *NodeP;
 
 struct Node_
 {
@@ -22,18 +22,10 @@ struct List_
     int size;
 };
 
-struct ListP_
-{
-    Particu head;
-    Particu tail;
-    int size;
-};
-
-
 struct Particula
 {
-    Particu next;
-    int idParticula; // particula do user, neste caso o size
+    //int idParticula; // particula do user, neste caso o size
+    char * NomeUser;
     int massa;
     int carga;
     float x;//posição em x
