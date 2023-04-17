@@ -2,35 +2,18 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
-#include "Cerebro/api.h"
-#include "Cerebro/Structs.c"
-
-
-bool CheckExistSameName(List a, char *b);
-void *list_remove_first(List list);
+#include "api.h"
+#include "FuncoesUnite.c"
+#include "Structs.c"
 
 void RegistUser(char *user, List list)
 {
+    if (list_is_empty(list))
+        list = list_create();
 
-    if (CheckEmpty(list))
-        list = list_createUser();
-
-    if (!CheckExistSameName(list, user))
+    if (list_find(list, list_equal, user) != -1)
     {
-        Node node = malloc(sizeof(struct Node_));
-        node->element = user;
-        node->next = NULL;
-
-        if (CheckEmpty(list))
-        {
-            list->head = node;
-        }
-        else
-            list->tail->next = node;
-
-        list->tail = node;
-        list->size++;
-
+        list_insert_last(list, user);
         printf("Utilizador registado com sucesso.\n");
     }
     else
@@ -39,102 +22,51 @@ void RegistUser(char *user, List list)
 
 void RemoveUser(List list, char *user)
 {
-    Node node = list->head;
-    Node prevNode = NULL;
-    int i = 0, position = CheckExistSameName(list, user);
-    if (position != -1)
-        while (node != NULL)
-        {
-            if (position == 0)
-            {
-                void *removedElement = list_remove_first(list);
-                printf("Utilizador removido com sucesso.\n");
-                list->head = node->next;
-                break;
-            }
-            if (i == position)
-            {
-                prevNode->next = node->next;
-                void *removedElement = node->element;
-                free(node);
-                printf("Utilizador removido com sucesso.\n");
-                break;
-            }
-            prevNode = node;
-            node = node->next;
-            i++;
-        }
-    else
-        printf("Utilizador não existente.\n");
+    if (list_find(list, list_equal, user) == -1)
+        return printf("Utilizador não existente.\n");
+
+    list_remove(list, list_find(list, list_equal, user));
+    printf("Utilizador removido com sucesso.\n");
 }
 
-bool CheckExistSameName(List list, char *name)
+void ListUser(List list)
 {
     Node node = list->head;
-    int check = 0;
     while (node != NULL)
     {
-        if (CheckEqualString(node->element, name))
-            check++;
-
-        if (check == 2)
-            return true;
-
+        printf("%s", node->element);
         node = node->next;
     }
-    return false;
 }
 
-void ListJogador(List list)
+void RegistSimSpace(List listuser, List lstPart, char *vs)
 {
-    Node node = list->head;
-    if (node == NULL)
-        printf("Não existem utilizadores registados.\n");
-    else
-        while (node != NULL)
-        {
-            printf("%p", node->element);
-            node = node->next;
-        }
-}
-
-void *list_remove_first(List list)
-{
-
-    Node node = list->head;
-    list->head = node->next;
-    void *element = node->element;
-    free(node);
-    return element;
-}
-
-/*void RegistSimSpace(ListP list, char * user){
-    if (CheckEmptyPart(list))
-        list = list_createPart();
-
-    if (!CheckExistSameName(list, user))
+    if (list_find(listuser, list_equal, vs) != -1)
     {
-        NodeP node = malloc(sizeof(struct NodeP_));
-        node->NomeUser = user;
-        node->next = NULL;
-
-        if (CheckEmpty(list))
-        {
-            list->head = node;
-        }
-        else
-            list->tail->next = node;
-
-        list->tail = node;
-        list->size++;
-
+        Particula part = malloc(sizeof(Particula_));
+        part->idParticula = lstPart->size++;
+        part->NomeUser = vs;
+        list_insert_last(lstPart, part);
         printf("Espaço de simulação registado com identificador IdentificadorEspaço.\n");
     }
     else
         printf("Utilizador inexistente.\n");
 }
 
-void RemoveSimSpace(ListP list, char * nome, char* Identificador){
-    //... O que é o Identificador??
-}*/
+void RemoveSimSpace(List lstUser, List lstPart, char *vs)
+{
+    
+    if (list_find(lstUser, list_equal, vs) == -1)
+        return printf("Utilizador inexistente.");
 
+    char *va = strtok(NULL, " ");
+    if (list_find(lstPart, list_equal, va) == -1)
+        return printf("Espaço de simulação inexistente.");
+
+    list_remove(lstPart, list_find(lstPart, list_equal, va));
+    printf("Espaço de simulação removido com sucesso.");
+}
+
+void RegistPart(List lstuser, List lstPart, char *vs){
+    
+}

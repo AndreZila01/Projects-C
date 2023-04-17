@@ -248,4 +248,13 @@ List list_map(List list, void* (*func)(void*));
  */
 List list_filter(List list, bool (*func)(void*));
 
+/**
+ * @brief Returns a true or false if the char * is equal.
+ *
+ * @param char1 is first string do you like compare.
+ * @param char2 is second string do you like compare.
+ * @return if char * is equal or is not equal.
+ */
+bool list_equal(void* char1, void* char2);
+
 #endif
