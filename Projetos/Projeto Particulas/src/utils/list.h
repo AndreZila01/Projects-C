@@ -1,5 +1,5 @@
-#ifndef API_H
-#define API_H
+#ifndef LIST_H
+#define LIST_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -190,7 +190,7 @@ int list_remove_all(List list, bool (*equal_element)(void*, void*), void (*free_
 int list_remove_duplicates(List list, bool (*equal_element)(void*, void*), void (*free_element)(void*), void* element);
 
 /**
- * @brief Returns the resulting from the join of two lists.
+ * @brief Returns the result from the join of two lists.
  *
  * Preserves order.
  *
@@ -225,7 +225,7 @@ List list_get_sublist_between(List list, int start_idx, int end_idx);
  *
  * @param list The linked list.
  * @param indexes The array of unordered indexes.
- * @param[out] count The size of the array.
+ * @param count The size of the array.
  * @return List A list with the elements in the given array of unordered indexes.
  */
 List list_get_sublist(List list, int indexes[], int count);
@@ -249,12 +249,26 @@ List list_map(List list, void* (*func)(void*));
 List list_filter(List list, bool (*func)(void*));
 
 /**
- * @brief Returns a true or false if the char * is equal.
+ * @brief Starts the iteration of the list.
  *
- * @param char1 is first string do you like compare.
- * @param char2 is second string do you like compare.
- * @return if char * is equal or is not equal.
+ * @param list The linked list.
  */
-bool list_equal(void* char1, void* char2);
+void list_iterator_start(List list);
+
+/**
+ * @brief Returns true if the list iterator has more elements.
+ *
+ * @param list The linked list.
+ * @return bool True if the list iterator has more elements.
+ */
+bool list_iterator_has_next(List list);
+
+/**
+ * @brief Returns the next element of the current list iterator.
+ *
+ * @param list The linked list.
+ * @return void* The next element of the list.
+ */
+void* list_iterator_get_next(List list);
 
 #endif
