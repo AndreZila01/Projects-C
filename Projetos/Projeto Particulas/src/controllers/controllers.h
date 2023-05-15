@@ -8,13 +8,13 @@ typedef struct
     HashTable users;
 } tApp, *App;
 
-App new_app();
+App new_user();
 
-void free_app(App app);
+void free_user(App app);
 
-bool has_app(App app, char *name);
+bool has_user(App app, char *name);
 
-void register_app(App app, char *name);
+void register_user(App app, char *name);
 
 typedef struct
 {
@@ -22,13 +22,13 @@ typedef struct
     HashTable simulation;
 } User_, *User;
 
-User new_user();
+User new_simulation();
 
-void free_user(User usern);
+void free_simulation(User usern);
 
-bool has_user(User usern, char *name);
+bool has_simulation(User usern, char *name);
 
-void register_user(User usern, char *name);
+void register_simulation(User usern, char *name);
 
 typedef struct
 {
@@ -40,9 +40,9 @@ SpaceSimulation new_space();
 
 void free_space(SpaceSimulation app);
 
-bool has_space(SpaceSimulation app, int* id);
+bool has_space(SpaceSimulation app, char* name);
 
-void register_space(SpaceSimulation app, int* id);
+void register_space(SpaceSimulation app, char* name);
 
 typedef struct
 {
