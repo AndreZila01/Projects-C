@@ -15,9 +15,10 @@ typedef struct t_HashTable* HashTable;
  * @param hash The hash function to use.
  * @param key_equal The function to compare keys.
  * @param key_destroy The function to free keys.
+ * @param value_destroy The function to free values.
  * @return HashTable The new hash table.
  */
-HashTable hash_table_create(int size, int (*hash)(void*, int), bool (*key_equal)(void*, void*), void (*key_destroy)(void*));
+HashTable hash_table_create(int size, int (*hash)(void*, int), bool (*key_equal)(void*, void*), void (*key_destroy)(void*), void (*value_destroy)(void*));
 
 /**
  * @brief Destroys a hash table.
@@ -25,10 +26,8 @@ HashTable hash_table_create(int size, int (*hash)(void*, int), bool (*key_equal)
  * Frees all memory allocated for the hash table, and for all keys and values of the hash table.
  * 
  * @param htable The hash table to destroy.
- * @param key_destroy The function to free keys.
- * @param value_destroy The function to free values.
  */
-void hash_table_destroy(HashTable htable, void (*value_destroy)(void*));
+void hash_table_destroy(HashTable htable);
 
 /**
  * @brief Inserts a new key-value pair into the hash table.
@@ -98,14 +97,6 @@ List hash_table_keys(HashTable htable);
  * @return List The keys of the hash table.
  */
 List hash_table_values(HashTable htable);
-
-/**
- * @brief Returns the values of the hash table.
- * 
- * @param htable The hash table.
- * @return List The values of the hash table.
- */
-List hash_table_entries(HashTable htable);
 
 /**
  * @brief Returns the entries of the hash table.

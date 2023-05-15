@@ -1,5 +1,18 @@
-bin/main: src/main.c src/controllers/task_list.c src/models/tasks.c src/views/cli.c src/utils/singly_linked_list.c
-	gcc -g $^ -o $@
+## Descomentar/alterar de acordo com o projeto
 
-clear:
-	rm src/bin/*
+UTILS=src/utils/singly_linked_list.c
+UTILS+=src/utils/open_hash_table.c
+
+MVC=src/views/cli.c
+MVC+=src/controllers/controllers.c
+MVC+=src/models/models.c
+
+## Não alterar a partir daqui
+
+CC=gcc
+CFLAGS=-Wall -Wextra -std=c99 -g
+# CFLAGS+=-Werror -pedantic
+
+main: src/main.c $(UTILS) $(MVC)
+	mkdir -p bin
+	$(CC) $(CFLAGS) -o bin/$@ $^

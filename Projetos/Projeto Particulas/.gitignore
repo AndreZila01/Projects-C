@@ -1,2 +1,5 @@
-bin
-utils/singly_linked_list.c
+bin/
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+src/utils/singly_linked_list.c

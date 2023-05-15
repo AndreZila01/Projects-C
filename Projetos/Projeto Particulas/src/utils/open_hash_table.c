@@ -11,6 +11,7 @@ typedef struct {
     void* value;
     bool (*key_equal)(void*, void*);
     void (*key_destroy)(void*);
+    void (*value_destroy)(void*);
 } t_Item, *Item;
 
 struct t_HashTable {
@@ -19,6 +20,7 @@ struct t_HashTable {
     List* table;
     bool (*key_equal)(void*, void*);
     void (*key_destroy)(void*);
+    void (*value_destroy)(void*);
     int (*hash)(void*, int);
 };
 
@@ -50,10 +52,47 @@ Item _item_create(HashTable htable, void* key, void* value) {
     item->value = value;
     item->key_equal = htable->key_equal;
     item->key_destroy = htable->key_destroy;
+    item->value_destroy = htable->value_destroy;
     return item;
 }
 
-HashTable hash_table_create(int size, int (*hash)(void*, int), bool (*key_equal)(void*, void*), void (*key_destroy)(void*)) {
+void _destroy_item(void* item, void (*key_destroy)(void*), void (*value_destroy)(void*)) {
+    Item i = (Item)item;
+    if (key_destroy != NULL) {
+        key_destroy(i->key);
+    }
+    if (value_destroy != NULL) {
+        value_destroy(i->value);
+    }
+    free(i);
+}
+
+void _collision_list_destroy_item(void* item) {
+    Item i = (Item)item;
+    if (i->key_destroy != NULL) {
+        i->key_destroy(i->key);
+    }
+    if (i->value_destroy != NULL) {
+        i->value_destroy(i->value);
+    }
+    free(i);
+}
+
+List _get_key_list(HashTable htable, void* key, bool* has_key, int* position) {
+    int index = htable->hash(key, htable->size) % htable->size;
+    List list = htable->table[index];
+    *has_key = false;
+    Item item = _item_create(htable, key, NULL);
+    *position = list_find(list, _equal_item, item);
+    _destroy_item(item, NULL, NULL);
+    if (*position != -1) {
+        *has_key = true;
+        return list;
+    }
+    return list;
+}
+
+HashTable hash_table_create(int size, int (*hash)(void*, int), bool (*key_equal)(void*, void*), void (*key_destroy)(void*), void (*value_destroy)(void*)) {
     HashTable htable = malloc(sizeof(struct t_HashTable));
     htable->num_elements = 0;
     if (size <= 0) {
@@ -72,6 +111,7 @@ HashTable hash_table_create(int size, int (*hash)(void*, int), bool (*key_equal)
         htable->key_equal = key_equal;
     }
     htable->key_destroy = key_destroy;
+    htable->value_destroy = value_destroy;
 
     htable->table = malloc(sizeof(List) * htable->size);
     for (int i = 0; i < htable->size; i++) {
@@ -80,51 +120,31 @@ HashTable hash_table_create(int size, int (*hash)(void*, int), bool (*key_equal)
     return htable;
 }
 
-void _destroy_item(void* item) {
-    Item i = (Item)item;
-    if (i->key_destroy != NULL) {
-        i->key_destroy(i->key);
-    }
-    free(i);
-}
-
-void hash_table_destroy(HashTable htable, void (*value_destroy)(void*)) {
+void hash_table_destroy(HashTable htable) {
     for (int i = 0; i < htable->size; i++) {
         List list = htable->table[i];
-        list_iterator_start(list);
-        while (list_iterator_has_next(list)) {
-            Item item = list_iterator_get_next(list);
-            if (htable->key_destroy != NULL) {
-                htable->key_destroy(item->key);
-            }
-            if (item->value != NULL) {
-                if (value_destroy != NULL) {
-                    value_destroy(item->value);
-                }
-            }
-        }
-        list_destroy(list, _destroy_item);
+        list_destroy(list, _collision_list_destroy_item);
     }
     free(htable->table);
     free(htable);
 }
 
 void hash_table_insert(HashTable htable, void* key, void* value) {
-    int index = htable->hash(key, htable->size) % htable->size;
-    List list = htable->table[index];
-    if (list_find(list, htable->key_equal, key) != -1) {
-        return;
+    bool has_key;
+    int position;
+    List list = _get_key_list(htable, key, &has_key, &position);
+    if (!has_key) {
+        Item item = _item_create(htable, key, value);
+        list_insert_last(list, item);
+        htable->num_elements++;
     }
-    Item item = _item_create(htable, key, value);
-    list_insert_last(list, item);
-    htable->num_elements++;
 }
 
 void* hash_table_remove(HashTable htable, void* key) {
-    int index = htable->hash(key, htable->size) % htable->size;
-    List list = htable->table[index];
-    int position = list_find(list, htable->key_equal, key);
-    if (position == -1) {
+    bool has_key;
+    int position;
+    List list = _get_key_list(htable, key, &has_key, &position);
+    if (!has_key) {
         return NULL;
     }
     Item item = list_remove(list, position);
@@ -135,28 +155,24 @@ void* hash_table_remove(HashTable htable, void* key) {
 }
 
 void* hash_table_get(HashTable htable, void* key) {
-    int index = htable->hash(key, htable->size) % htable->size;
-    List list = htable->table[index];
-    Item item = _item_create(htable, key, NULL);
-    int position = list_find(list, _equal_item, item);
-    _destroy_item(item);
-    if (position == -1) {
+    bool has_key;
+    int position;
+    List list = _get_key_list(htable, key, &has_key, &position);
+    if (!has_key) {
         return NULL;
     }
-    item = list_get(list, position);
+    Item item = list_get(list, position);
     return item->value;
 }
 
 void* hash_table_update(HashTable htable, void* key, void* value) {
-    int index = htable->hash(key, htable->size) % htable->size;
-    List list = htable->table[index];
-    Item item = _item_create(htable, key, NULL);
-    int position = list_find(list, _equal_item, item);
-    free(item);
-    if (position == -1) {
+    bool has_key;
+    int position;
+    List list = _get_key_list(htable, key, &has_key, &position);
+    if (!has_key) {
         return NULL;
     }
-    item = list_get(list, position);
+    Item item = list_get(list, position);
     void* old_value = item->value;
     item->value = value;
     return old_value;
@@ -196,24 +212,11 @@ List hash_table_values(HashTable htable) {
     return values;
 }
 
-List hash_table_entries(HashTable htable) {
-    List entries = list_create();
-    for (int i = 0; i < htable->size; i++) {
-        List list = htable->table[i];
-        list_iterator_start(list);
-        while (list_iterator_has_next(list)) {
-            Item item = list_iterator_get_next(list);
-            list_insert_last(entries, item);
-        }
-    }
-    return entries;
-}
-
 void hash_table_rehash(HashTable htable, int new_size) {
     if (new_size <= 0) {
         return;
     }
-    HashTable new_htable = hash_table_create(new_size, htable->hash, htable->key_equal, htable->key_destroy);
+    HashTable new_htable = hash_table_create(new_size, htable->hash, htable->key_equal, htable->key_destroy, htable->value_destroy);
     for (int i = 0; i < htable->size; i++) {
         List list = htable->table[i];
         list_iterator_start(list);
@@ -222,7 +225,7 @@ void hash_table_rehash(HashTable htable, int new_size) {
             hash_table_insert(new_htable, item->key, item->value);
         }
     }
-    hash_table_destroy(htable, NULL);
+    hash_table_destroy(htable);
     htable->size = new_htable->size;
     htable->num_elements = new_htable->num_elements;
     htable->table = new_htable->table;

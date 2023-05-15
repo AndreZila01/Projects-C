@@ -1,4 +1,4 @@
-#include "src/views/cli.h"
+#include "views/cli.h"
 
 int main() {
     run_cli();
