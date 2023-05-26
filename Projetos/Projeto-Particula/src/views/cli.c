@@ -8,6 +8,38 @@
 #include <string.h>
 #include <stdlib.h>
 
+#pragma region Funções
+void RJ(App app, char *name)
+{
+    if (app_has_user(app, name))
+        printf("Utilizador existente.\n");
+    else
+    {
+        register_user(app, name);
+        printf("Utilizador registado com sucesso.\n");
+    }
+}
+
+void EJ(App app, char *name)
+{
+    if (!app_has_user(app, name))
+        printf("Utilizador não existente.\n");
+    else
+    {
+        // free_user(ValueOfUser(app, description));
+        free_user(app);
+        printf("Utilizador removido com sucesso.\n");
+    }
+}
+
+void LJ(App app)
+{
+    if (SizeOfHash(app) != -1)
+        hash_list(app);
+}
+
+#pragma endregion
+
 void run_cli()
 {
     char *line = NULL;
@@ -18,45 +50,20 @@ void run_cli()
         getline(&line, &len, stdin);
         line[strlen(line) - 1] = '\0';
         if (strlen(line) == 0)
-        {
             break;
-        }
+
         char *command = strtok(line, " ");
         if (strcmp(command, "RJ") == 0)
-        {
-            char *name = strtok(NULL, " ");
-            if (has_user(app, name))
-            {
-                printf("Utilizador existente.\n");
-            }
-            else
-            {
-                register_user(app, name);
-                printf("Utilizador registado com sucesso.\n");
-            }
-        }
+            RJ(app, strtok(NULL, " "));
         else if (strcmp(command, "EJ") == 0)
-        {
-            char *description = strtok(NULL, "\n");
-            if (!has_user(app, description))
-                printf("Utilizador não existente.\n");
-            else
-            {
-                free_user(hash_table_get(app, description));
-                printf("Utilizador removido com sucesso.\n");
-            }
-        }
+            EJ(app, strtok(NULL, " "));
         else if (strcmp(command, "LJ") == 0)
-        {
-            if (SizeOfHash(app) != -1)
-                hash_list(app);
-        }
+            LJ(app);
         else if (strcmp(command, "RE") == 0)
         {
             char *name = strtok(NULL, " ");
             if (has_user(app, name))
                 printf("Utilizador existente.\n");
-
             else
             {
                 register_simulation(app, name);
@@ -72,7 +79,7 @@ void run_cli()
             {
                 if (has_simulation(app->users, description))
                 {
-                    free_simulation(hash_table_get(app->users->, description));
+                    free_simulation(app->users);
                     printf("Espaço de simulação removido com sucesso.\n");
                 }
                 else
@@ -100,4 +107,5 @@ void run_cli()
         free(line);
     }
     free_app(app);
+    free(&line);
 }

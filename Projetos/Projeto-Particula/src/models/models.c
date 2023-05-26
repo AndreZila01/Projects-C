@@ -1,17 +1,73 @@
-#include "controllers.h"
-#include "../models/models.h"
+#include "models.h"
 
 #include <stdlib.h>
+
+#define _XOPEN_SOURCE 500
 #include <string.h>
 
-#pragma region User
-
-App new_user()
-{
-    App app = malloc(sizeof(tApp));
-    app->users = hash_table_create(0, NULL, NULL, NULL, (void (*)(void *))free_user);
-    return app;
+#pragma region HashTable
+void free_key(void* key) {
+    free(key);
 }
+
+void free_value(void* value) {
+    free(value);
+}
+
+bool equal_ints(void* key1, void* key2) {
+    int* k1 = (int*)key1;
+    int* k2 = (int*)key2;
+    return *k1 == *k2;
+}
+
+#pragma endregion
+
+#pragma region  User
+
+User new_user(char* name) {
+    User user = malloc(sizeof(User_));
+    user->name = name;
+    return user;
+}
+
+void free_user(User user) {
+    free(user->name);
+    free(user);
+    // TODO: Falta atualizar para os novos campos de User.
+}
+
+int SizeOfHash(App usern)
+{
+    return hash_table_size(usern->users);
+}
+#pragma endregion
+
+#pragma region Space
+
+char* register_space(User users, char* user_name) {
+    User user = hash_table_get(users, user_name);
+    // 0. Criar o identificador de espaço
+    char space_id[80];
+    //sprintf(space_id, "%d", user->next_space_id);
+    SpaceSimulation space = new_space(user->next_space_id);
+    user->next_space_id++;
+    
+    SpaceSimulation space = new_space(space_id);
+    
+    hash_table_insert(user->simulation, space->id, space);
+    return space->id;
+}
+
+
+
+#pragma endregion
+
+#pragma region Particle
+
+#pragma endregion
+
+
+
 
 void free_user(App app)
 {
@@ -19,10 +75,12 @@ void free_user(App app)
     free(app);
 }
 
-bool has_user(App app, char *name)
+void* ValueOfUser(App app, char *name)
 {
-    return hash_table_get(app->users, name) != NULL;
+    return hash_table_get(app->users, name);
 }
+
+
 
 void register_user(App app, char *name)
 {
@@ -30,10 +88,6 @@ void register_user(App app, char *name)
     hash_table_insert(app->users, name, user);
 }
 
-int SizeOfHash(App usern)
-{
-    return hash_table_size(usern->users);
-}
 
 void list_user(App usern)
 {
@@ -71,12 +125,6 @@ bool has_simulation(User usern, char *name)
     return hash_table_get(usern->simulation_spaces, name) != NULL;
 }
 
-void register_simulation(User usern, char *name)
-{
-    User user = new_app(name);
-    hash_table_insert(usern->simulation_spaces, name, user);
-}
-
 
 #pragma endregion
 
@@ -105,33 +153,3 @@ void register_space(SpaceSimulation app, char *name)
     User user = new_app(name);
     hash_table_insert(app->particle, name, user);
 }
-
-#pragma endregion
-
-// #pragma region Particle
-
-// Particle new_Part()
-// {
-//     App app = malloc(sizeof(tApp));
-//     app->users = hash_table_create(0, NULL, NULL, NULL, (void (*)(void *))free_user);
-//     return app;
-// }
-
-// void free_Part(Particle part)
-// {
-//     hash_table_destroy(app->users);
-//     free(app);
-// }
-
-// bool has_Part(Particle part, int *idParticula, char *NomeUser, int massa, int carga, float x, float y, float z, float Vx, float Vy, float Vz)
-// {
-//     return hash_table_get(app->users, name) != NULL;
-// }
-
-// void register_Part(Particle part, char *name)
-// {
-//     User user = new_app(name);
-//     hash_table_insert(app->users, name, user);
-// }
-
-// #pragma endregion

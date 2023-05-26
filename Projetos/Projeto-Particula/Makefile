@@ -1,9 +1,9 @@
 ## Descomentar/alterar de acordo com o projeto
 
-UTILS=src/utils/singly_linked_list.c
 UTILS+=src/utils/open_hash_table.c
 
 MVC=src/views/cli.c
+MVC+=src/controllers/controllers.c
 MVC+=src/controllers/controllers.c
 MVC+=src/models/models.c
 
