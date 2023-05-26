@@ -9,9 +9,11 @@ typedef struct
     HashTable users;
 } tApp, *App;
 
-App app_new_user();
+App app_new();
 
-void app_free_user(App app);
+void list_user(App usern);
+
+void app_free_app(App app);
 
 bool app_has_user(App app, char *name);
 
@@ -19,29 +21,43 @@ void app_register_user(App app, char *name);
 
 User app_new_simulation();
 
-void app_free_simulation(User usern);
+void app_free_simulation(App usern, char* name);
 
-bool app_has_simulation(User usern, char *name);
+bool app_has_simulation(App usern, char *name);
 
-void app_register_simulation(User usern, char *name);
+void app_register_simulation(App app, char* user_name);
 
 int app_SizeOfHash(App usern);
 
-SpaceSimulation app_new_space();
+void* app_ValueOfUser(App app, char *name);
 
-void app_free_space(SpaceSimulation app);
+int app_hash_ints(void* key, int size);
 
-bool app_has_space(SpaceSimulation app, char* name);
+void app_remove_user(App app, char *name);
 
-void app_register_space(App app, char* name);
+void free_app(App app);
+
+// int app_SizeOfHash(App usern);
+
+// SpaceSimulation app_new_space();
+
+// void app_free_space(SpaceSimulation app);
+
+// bool app_has_space(SpaceSimulation app, char* name);
+
+// void app_register_space(App app, char* name);
 
 
-Particle app_new_Part();
+// Particle app_new_Part();
 
-void app_free_Part(Particle part);
+// void app_free_Part(Particle part);
 
-bool app_has_Part(Particle part, int * idParticula, char *NomeUser, int massa, int carga, float x, float y, float z, float Vx, float Vy, float Vz);
+// bool app_has_Part(Particle part, int * idParticula, char *NomeUser, int massa, int carga, float x, float y, float z, float Vx, float Vy, float Vz);
 
-void app_register_Part(Particle part, char *name);
+// void app_register_Part(Particle part, char *name);
+
+void app_Registar_Part(App app, char* name,char*  identifi,float massa, float carga, float pix, float piy, float piz, float vx, float vy, float vz);
+
+void app_Modify_Part(app, name, IdenSpace, IdenPart, massa, carga, pix, piy, piz, vx, vy, vz);
 
 #endif

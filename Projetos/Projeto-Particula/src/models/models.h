@@ -6,13 +6,14 @@
 typedef struct
 {
     char *name;
+    int next_space_id;
     HashTable simulation;
 } User_, *User;
 
 typedef struct
 {
-    int id;
-    int next_space_id;
+    int* id;
+    //int next_space_id;
     HashTable particle;
 } SpaceSimulation_, *SpaceSimulation;
 
@@ -34,6 +35,20 @@ User new_user(char* name);
 
 void free_user(User user);
 
-bool equal_ints(void* key1, void* key2)
+bool equal_ints(void* key1, void* key2);
+
+void register_simulation(User users);
+
+SpaceSimulation new_space(int id);
+
+void free_Particle(SpaceSimulation space);
+
+void free_Space(User user);
+
+bool has_simulation(User user, char *name);
+
+bool has_Particle(SpaceSimulation sim, char *name);
+
+void* return_simulation(User user, char* name);
 
 #endif
