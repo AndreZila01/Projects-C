@@ -36,13 +36,21 @@ void space_free(void* space) {
 User new_user(char* name) {
     User user = malloc(sizeof(User_));
     user->name = name;
-    user->simulation = hash_table_create(0, hash_space_id, equal_ints, NULL, space_free);
+    user->Spacesimulation = hash_table_create(0, hash_space_id, equal_ints, NULL, space_free);
     return user;
 }
 
 void free_user(User user) {
     free(user->name);
+    hash_table_destroy(user->Spacesimulation);
     free(user);
+    // TODO: Falta atualizar para os novos campos de User.
+}
+
+void free_Simulacao(SpaceSimulation space) {
+    free(space->id);
+    hash_table_destroy(space->particle);
+    free(space);
     // TODO: Falta atualizar para os novos campos de User.
 }
 
@@ -55,7 +63,7 @@ void register_simulation(User user) {
     SpaceSimulation space = new_space(user->next_space_id);
     user->next_space_id++;
 
-    hash_table_insert(user->simulation, space->id, space);
+    hash_table_insert(user->Spacesimulation, space->id, space);
     //return space->id;
 }
 
@@ -75,18 +83,28 @@ void free_Particle(SpaceSimulation space)
 
 void free_Space(User user)
 {
-    free(user->simulation);
+    free(user->Spacesimulation);
+    free(user->name);
+    free(user->next_space_id);
     free(user);
 }
 
 bool has_simulation(User user, char *name)
 {
-    return hash_table_get(user->simulation, name) != NULL;
+    return hash_table_get(user->Spacesimulation, name) != NULL;
 }
 
 bool has_Particle(SpaceSimulation sim, char *name)
 {
     return hash_table_get(sim->particle, name) != NULL;
+}
+
+int size_Simulation(User sim){
+    return hash_table_size(sim->Spacesimulation);
+}
+
+bool Simulation_OnOff(User sim){
+    return sim->simulation_on;
 }
 
 int size_Particle(SpaceSimulation sim){
@@ -95,5 +113,5 @@ int size_Particle(SpaceSimulation sim){
 
 void* return_simulation(User user, char* name)
 {
-    return hash_table_get(user->simulation, name);
+    return hash_table_get(user->Spacesimulation, name);
 }

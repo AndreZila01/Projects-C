@@ -7,7 +7,8 @@ typedef struct
 {
     char *name;
     int next_space_id;
-    HashTable simulation;
+    bool simulation_on; // simuação realizada.
+    HashTable Spacesimulation;
 } User_, *User;
 
 typedef struct
@@ -41,6 +42,8 @@ void register_simulation(User users);
 
 SpaceSimulation new_space(int id);
 
+int size_Simulation(User sim);
+
 void free_Particle(SpaceSimulation space);
 
 void free_Space(User user);
@@ -50,5 +53,7 @@ bool has_simulation(User user, char *name);
 bool has_Particle(SpaceSimulation sim, char *name);
 
 void* return_simulation(User user, char* name);
+
+bool Simulation_OnOff(User sim);
 
 #endif

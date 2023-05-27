@@ -26,8 +26,13 @@ void EJ(App app, char *name)
     else
     {
         // app_free_app(app);
-        app_remove_user(app, name);
-        printf("Utilizador removido com sucesso.\n");
+        if (size_Simulation(app->users)>0 && Simulation_OnOff(app->users))//Não percebi nada!
+        {
+            app_remove_user(app, name);
+            printf("Utilizador removido com sucesso.\n");
+        }
+        //else
+          //  printf("Utilizador tem espaços de simulação sem simulações realizadas.\n");
     }
 }
 
@@ -39,7 +44,7 @@ void LJ(App app)
 
 void RE(App app, char *name)
 {
-    if (!app_has_user(app, name))
+    if (app_has_user(app, name))
         printf("Utilizador existente.\n");
     else
     {
@@ -60,17 +65,17 @@ void EE(App app, char *name)
             printf("Espaço de simulação removido com sucesso.\n");
         }
         else
-            printf("Espaço de simulação inexistente.");
+            printf("Espaço de simulação inexistente.\n");
     }
 }
 
 void RP(App app, char *name, char *identifi)
 {
-    int massa=0, carga=0, pix=0, piy=0, piz=0, vx=0, vy=0, vz=0;
+    int massa = 0, carga = 0, pix = 0, piy = 0, piz = 0, vx = 0, vy = 0, vz = 0;
     char *row_contents = NULL;
     size_t row_len = 0;
 
-    //MASSA >=0, CARGA percente a Z
+    // MASSA >=0, CARGA percente a Z
     getline(&row_contents, &row_len, stdin);
     row_contents[strlen(row_contents) - 1] = '\0';
     massa = atof(strtok(row_contents, " "));
@@ -85,7 +90,6 @@ void RP(App app, char *name, char *identifi)
     piy = atof(strtok(NULL, " "));
     piz = atof(strtok(NULL, " "));
 
-    
     free(row_contents);
     row_contents = NULL;
 
@@ -100,13 +104,14 @@ void RP(App app, char *name, char *identifi)
     app_Registar_Part(app, name, identifi, massa, carga, pix, piy, piz, vx, vy, vz);
 }
 
-void AP(App app, char* name, char* IdenSpace, char* IdenPart){
-    
-    int massa=0, carga=0, pix=0, piy=0, piz=0, vx=0, vy=0, vz=0;
+void AP(App app, char *name, char *IdenSpace, char *IdenPart)
+{
+
+    int massa = 0, carga = 0, pix = 0, piy = 0, piz = 0, vx = 0, vy = 0, vz = 0;
     char *row_contents = NULL;
     size_t row_len = 0;
 
-    //MASSA >=0, CARGA percente a Z
+    // MASSA >=0, CARGA percente a Z
     getline(&row_contents, &row_len, stdin);
     row_contents[strlen(row_contents) - 1] = '\0';
     massa = atof(strtok(row_contents, " "));
@@ -121,7 +126,6 @@ void AP(App app, char* name, char* IdenSpace, char* IdenPart){
     piy = atof(strtok(NULL, " "));
     piz = atof(strtok(NULL, " "));
 
-    
     free(row_contents);
     row_contents = NULL;
 
@@ -136,8 +140,8 @@ void AP(App app, char* name, char* IdenSpace, char* IdenPart){
     app_Modify_Part(app, name, IdenSpace, IdenPart, massa, carga, pix, piy, piz, vx, vy, vz);
 }
 
-void S(){
-
+void S()
+{
 }
 
 void run_cli()
@@ -163,11 +167,11 @@ void run_cli()
             RE(app, strtok(NULL, " "));
         else if (strcmp(command, "EE") == 0) // Remover Simulacao
             EE(app, strtok(NULL, " "));
-        else if (strcmp(command, "RP") == 0) // Remover particula
+        else if (strcmp(command, "RP") == 0) // Registar particula
             RP(app, strtok(NULL, " "), strtok(NULL, " "));
         else if (strcmp(command, "AP") == 0) // Alterar Particula
         {
-            Ap(app, strtok(NULL, " "), strtok(NULL, " "), strtok(NULL, " "));
+            AP(app, strtok(NULL, " "), strtok(NULL, " "), strtok(NULL, " "));
         }
         else if (strcmp(command, "S") == 0) // Simular
         {

@@ -2,4 +2,3 @@ bin/
 .vscode/*
 !.vscode/tasks.json
 !.vscode/launch.json
-src/utils/singly_linked_list.c

@@ -15,6 +15,18 @@ void list_user(App app)
 {
     // List user_list = hash_table_values(app->users);
     // int size = list_size(user_list);
+    // User *user_array = malloc(sizeof(User) * size);
+    // for (int i = 0; i < size; i++)
+    // {
+    //     user_array[i] = (User)list_get(user_list, i);
+    // }
+    //qsort(user_array, size, sizeof(User), compare_users);
+
+    //list_free(user_list);
+
+    //return user_array;
+    // List user_list = hash_table_values(app->users);
+    // int size = list_size(user_list);
 
     // void *value = hash_table_values(usern);
     // int lenght = hash_table_size(usern), val = 0;
@@ -55,7 +67,8 @@ void app_free_space(App app)
 
 void app_remove_user(App app, char *name)
 {
-    hash_table_remove(app->users, name);
+    User user = hash_table_remove(app->users, name);
+    free_user(user);
 }
 
 bool app_has_user(App app, char *name)
@@ -192,6 +205,7 @@ void app_Registar_Part(App app, char *name, char *identifi, float massa, float c
     }
 }
 
-void app_Modify_Part(app, name, IdenSpace, IdenPart, massa, carga, pix, piy, piz, vx, vy, vz){
-    //FAZER AP
+void app_Modify_Part(app, name, IdenSpace, IdenPart, massa, carga, pix, piy, piz, vx, vy, vz)
+{
+    // FAZER AP
 }
