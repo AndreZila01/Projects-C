@@ -60,4 +60,9 @@ void app_Registar_Part(App app, char* name,char*  identifi,float massa, float ca
 
 void app_Modify_Part(app, name, IdenSpace, IdenPart, massa, carga, pix, piy, piz, vx, vy, vz);
 
+int compareUsersByName(void* Namea, void* Nameb);
+
+void* app_ConvertUserToArray(App app, int userCount);
+
+int app_user_simulatorCount(User user);
 #endif

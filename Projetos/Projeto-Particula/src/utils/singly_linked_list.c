@@ -362,10 +362,19 @@ void *list_remove(List list, int position)
  * @param list The linked list.
  * @param out_array The array to fill with the elements of the list.
  */
-// void list_to_array(List list, void **out_array)
-// {
-//     return NULL;
-// }
+void list_to_array(List list, void **out_array)
+{
+    if (list == NULL) 
+        return; 
+  
+    // Traverse the linked list and copy elements to the array
+    Node current = list->head;
+    size_t index = -1;
+    while (current != NULL) {
+        out_array[index++] = current;
+        current = current->next;
+    } 
+}
 
 /**
  * @brief Returns the number of occurrences on an element.

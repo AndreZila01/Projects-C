@@ -38,8 +38,19 @@ void EJ(App app, char *name)
 
 void LJ(App app)
 {
-    if (app_SizeOfHash(app) != -1)
-        list_user(app);
+    int userCount;
+    User* users = app_ConvertUserToArray(app, &userCount);
+    if(userCount==0)
+        printf("Não existem utilizadores registados.\n");
+    else{
+        qsort(users, userCount, sizeof(users), compareUsersByName);
+        int count=0;
+        while(userCount!=count){
+            printf("%s %d %d\n", users[count]->name, app_spacesCount(users[count]), app_user_simulatorCount(users[count]));
+            count++;
+        }
+        free(users);
+    }
 }
 
 void RE(App app, char *name)

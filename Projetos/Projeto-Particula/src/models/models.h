@@ -2,6 +2,7 @@
 #define MODELS_H
 
 #include "../utils/hash_table.h"
+#include "../utils/list.h"
 
 typedef struct
 {
@@ -13,9 +14,10 @@ typedef struct
 
 typedef struct
 {
-    int* id;
+    char* id;
     //int next_space_id;
     HashTable particle;
+    int SimulationCount;
 } SpaceSimulation_, *SpaceSimulation;
 
 typedef struct
@@ -55,5 +57,7 @@ bool has_Particle(SpaceSimulation sim, char *name);
 void* return_simulation(User user, char* name);
 
 bool Simulation_OnOff(User sim);
+
+void* app_ConvertArray(List lst, int userCount);
 
 #endif

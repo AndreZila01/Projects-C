@@ -1,5 +1,6 @@
 #include "controllers.h"
 #include "../models/models.h"
+#include "../utils/list.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,6 +38,12 @@ void list_user(App app)
     //     printf("Espaço de simulação registado com identificador %s.\n", value); // Corrigir-me coletar o valor do identificador
     //     val++;
     // }
+}
+
+int compareUsersByName(void* Namea, void* Nameb) {
+    char* user1 = (char*)Namea;
+    char* user2 = (char*)Nameb;
+    return strcmp(user1, user2);
 }
 
 void app_free_app(App app)
@@ -114,6 +121,10 @@ bool app_has_simulation(App app, char *name)
 int app_SizeOfHash(App usern)
 {
     return hash_table_size(usern->users);
+}
+
+int app_spacesCount(void* user){
+    return size_Simulation(user);
 }
 
 // SpaceSimulation app_new_space(){
@@ -208,4 +219,12 @@ void app_Registar_Part(App app, char *name, char *identifi, float massa, float c
 void app_Modify_Part(app, name, IdenSpace, IdenPart, massa, carga, pix, piy, piz, vx, vy, vz)
 {
     // FAZER AP
+}
+
+int app_user_simulatorCount(User user){
+    return size_Simulation(user);
+}
+
+void* app_ConvertUserToArray(App app, int userCount){
+    return app_ConvertArray(hash_table_values(app->users), userCount);
 }

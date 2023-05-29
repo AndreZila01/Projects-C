@@ -1,6 +1,7 @@
 #define _XOPEN_SOURCE 500
 #include "models.h"
 #include "../utils/hash_table.h"
+#include "../utils/singly_linked_list.c"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,7 +45,6 @@ void free_user(User user) {
     free(user->name);
     hash_table_destroy(user->Spacesimulation);
     free(user);
-    // TODO: Falta atualizar para os novos campos de User.
 }
 
 void free_Simulacao(SpaceSimulation space) {
@@ -114,4 +114,21 @@ int size_Particle(SpaceSimulation sim){
 void* return_simulation(User user, char* name)
 {
     return hash_table_get(user->Spacesimulation, name);
+}
+
+
+void* app_ConvertArray(List lst, int userCount){
+    userCount = list_size(lst);
+    char* User[userCount];
+
+    Node node = lst->head;
+    int i=0;
+    while (node != NULL)
+    {
+        User[i]=node->element;
+        node = node->next;
+        i++;
+    }
+    
+    return User;
 }
