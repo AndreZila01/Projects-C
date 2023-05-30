@@ -1,7 +1,6 @@
 #define _XOPEN_SOURCE 500
 #include "models.h"
 #include "../utils/hash_table.h"
-#include "../utils/singly_linked_list.c"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,12 +36,12 @@ void space_free(void* space) {
 User new_user(char* name) {
     User user = malloc(sizeof(User_));
     user->name = name;
+    user->simulation_on = false;
     user->Spacesimulation = hash_table_create(0, hash_space_id, equal_ints, NULL, space_free);
     return user;
 }
 
 void free_user(User user) {
-    free(user->name);
     hash_table_destroy(user->Spacesimulation);
     free(user);
 }
@@ -67,11 +66,12 @@ void register_simulation(User user) {
     //return space->id;
 }
 
-SpaceSimulation new_space(int id)
+SpaceSimulation new_space(char* id)
 {
     SpaceSimulation space = malloc(sizeof(SpaceSimulation_));
     space->id = malloc(sizeof(int));
     *(space->id) = id;
+    //space
     return space;
 }
 
@@ -99,8 +99,12 @@ bool has_Particle(SpaceSimulation sim, char *name)
     return hash_table_get(sim->particle, name) != NULL;
 }
 
-int size_Simulation(User sim){
-    return hash_table_size(sim->Spacesimulation);
+int SimulationCount(User sim){
+    return ((SpaceSimulation)(hash_table_size(sim->Spacesimulation)))->SimulationCount;
+}
+
+int SpaceSimulationCount(User sim){
+    return ((SpaceSimulation)(hash_table_size(sim->Spacesimulation)))->SpaceSimulationCount;
 }
 
 bool Simulation_OnOff(User sim){
@@ -121,12 +125,10 @@ void* app_ConvertArray(List lst, int userCount){
     userCount = list_size(lst);
     char* User[userCount];
 
-    Node node = lst->head;
     int i=0;
-    while (node != NULL)
+    while (i!=userCount)
     {
-        User[i]=node->element;
-        node = node->next;
+        User[i]= list_get(lst, i);
         i++;
     }
     

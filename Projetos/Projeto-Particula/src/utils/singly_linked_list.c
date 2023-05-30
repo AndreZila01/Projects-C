@@ -169,7 +169,7 @@ int list_find(List list, bool (*equal)(void *, void *), void *element)
 
     while (node != NULL)
     {
-        if (equal(node->element,element))
+        if (equal(node->element, element))
             return id;
         node = node->next;
         id++;
@@ -230,19 +230,21 @@ void list_insert_last(List list, void *element)
  */
 void list_insert(List list, void *element, int position)
 {
-    if (position < 0 || position > list_size(list))
+    size_t v = list_size(list);
+
+    /*if (position < 0 || position > v)
     {
-        return NULL;
-    }
+        
+    }*/
     if (position == 0)
     {
         list_insert_first(list, element);
     }
-    else if (position == list_size(list))
+    else if (position == v)
     {
         list_insert_last(list, element);
     }
-    else
+    else if (position > 0 || position < v)
     {
         Node node = list->head;
         int idx = 0;
@@ -364,16 +366,17 @@ void *list_remove(List list, int position)
  */
 void list_to_array(List list, void **out_array)
 {
-    if (list == NULL) 
-        return; 
-  
+    if (list == NULL)
+        return;
+
     // Traverse the linked list and copy elements to the array
     Node current = list->head;
     size_t index = -1;
-    while (current != NULL) {
+    while (current != NULL)
+    {
         out_array[index++] = current;
         current = current->next;
-    } 
+    }
 }
 
 /**

@@ -26,26 +26,29 @@ void EJ(App app, char *name)
     else
     {
         // app_free_app(app);
-        if (size_Simulation(app->users)>0 && Simulation_OnOff(app->users))//Não percebi nada!
+        if (app_user_simulatorCount(app->users) > 0 && Simulation_OnOff(app->users)) // Não percebi nada!
         {
             app_remove_user(app, name);
             printf("Utilizador removido com sucesso.\n");
         }
-        //else
-          //  printf("Utilizador tem espaços de simulação sem simulações realizadas.\n");
+        // else
+        //   printf("Utilizador tem espaços de simulação sem simulações realizadas.\n");
     }
 }
 
 void LJ(App app)
 {
-    int userCount;
-    User* users = app_ConvertUserToArray(app, &userCount);
-    if(userCount==0)
+    int userCount=0;
+    User *users = app_ConvertUserToArray(app, &userCount);
+    if (userCount == 0)
         printf("Não existem utilizadores registados.\n");
-    else{
-        qsort(users, userCount, sizeof(users), compareUsersByName);
-        int count=0;
-        while(userCount!=count){
+    else
+    {
+        if (userCount > 1)
+            qsort(users, userCount, sizeof(users), compareUsersByName);
+        int count = 0;
+        while (userCount != count)
+        {
             printf("%s %d %d\n", users[count]->name, app_spacesCount(users[count]), app_user_simulatorCount(users[count]));
             count++;
         }
@@ -55,8 +58,8 @@ void LJ(App app)
 
 void RE(App app, char *name)
 {
-    if (app_has_user(app, name))
-        printf("Utilizador existente.\n");
+    if (!app_has_user(app, name))
+        printf("Utilizador inexistente.\n");
     else
     {
         app_register_simulation(app, name);
@@ -153,6 +156,7 @@ void AP(App app, char *name, char *IdenSpace, char *IdenPart)
 
 void S()
 {
+    // SimulationCount++;
 }
 
 void run_cli()

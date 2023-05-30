@@ -64,5 +64,8 @@ int compareUsersByName(void* Namea, void* Nameb);
 
 void* app_ConvertUserToArray(App app, int userCount);
 
-int app_user_simulatorCount(User user);
+int app_user_simulatorCount(App user);
+
+int app_spacesCount(App app);
+
 #endif

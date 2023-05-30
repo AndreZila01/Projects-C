@@ -123,8 +123,8 @@ int app_SizeOfHash(App usern)
     return hash_table_size(usern->users);
 }
 
-int app_spacesCount(void* user){
-    return size_Simulation(user);
+int app_spacesCount(App app){
+    return SpaceSimulationCount(app->users);
 }
 
 // SpaceSimulation app_new_space(){
@@ -221,8 +221,8 @@ void app_Modify_Part(app, name, IdenSpace, IdenPart, massa, carga, pix, piy, piz
     // FAZER AP
 }
 
-int app_user_simulatorCount(User user){
-    return size_Simulation(user);
+int app_user_simulatorCount(App app){
+    return SimulationCount(app->users);
 }
 
 void* app_ConvertUserToArray(App app, int userCount){

@@ -17,7 +17,8 @@ typedef struct
     char* id;
     //int next_space_id;
     HashTable particle;
-    int SimulationCount;
+    int SpaceSimulationCount; //Espaços de simulação do user
+    int SimulationCount; //Simulações executadas
 } SpaceSimulation_, *SpaceSimulation;
 
 typedef struct
@@ -42,7 +43,7 @@ bool equal_ints(void* key1, void* key2);
 
 void register_simulation(User users);
 
-SpaceSimulation new_space(int id);
+SpaceSimulation new_space(char* id);
 
 int size_Simulation(User sim);
 
@@ -58,6 +59,10 @@ void* return_simulation(User user, char* name);
 
 bool Simulation_OnOff(User sim);
 
+int SimulationCount(User sim);
+
 void* app_ConvertArray(List lst, int userCount);
+
+int SpaceSimulationCount(User sim);
 
 #endif
