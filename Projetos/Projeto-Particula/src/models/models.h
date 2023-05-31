@@ -61,8 +61,11 @@ bool Simulation_OnOff(User sim);
 
 int SimulationCount(User sim);
 
-void* app_ConvertArray(List lst, int userCount);
+void* ConvertArray(List lst, int userCount);
 
 int SpaceSimulationCount(User sim);
 
+void Modify_Part(User user, char* name, char* IdenSpace, char* IdenPart, float massa, float carga, float pix, float piy, float piz, float vx, float vy, float vz);
+
+void printformulas(User user, char* name, char* IdentificadorEspaço, char* IdentificadorParticula, int tempo, int passo, char* file);
 #endif

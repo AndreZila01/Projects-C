@@ -21,13 +21,13 @@ void list_user(App app)
     // {
     //     user_array[i] = (User)list_get(user_list, i);
     // }
-    //qsort(user_array, size, sizeof(User), compare_users);
+    // qsort(user_array, size, sizeof(User), compare_users);
 
-    //list_free(user_list);
+    // list_free(user_list);
 
-    //return user_array;
-    // List user_list = hash_table_values(app->users);
-    // int size = list_size(user_list);
+    // return user_array;
+    //  List user_list = hash_table_values(app->users);
+    //  int size = list_size(user_list);
 
     // void *value = hash_table_values(usern);
     // int lenght = hash_table_size(usern), val = 0;
@@ -40,10 +40,14 @@ void list_user(App app)
     // }
 }
 
-int compareUsersByName(void* Namea, void* Nameb) {
-    char* user1 = (char*)Namea;
-    char* user2 = (char*)Nameb;
-    return strcmp(user1, user2);
+int compareUsersByName(void *Namea, void *Nameb)
+{
+    // char* user1 = (char*)Namea;
+    // char* user2 = (char*)Nameb;
+    // return strcmp(user1, user2);
+    User *user1 = (User *)Namea;
+    User *user2 = (User *)Nameb;
+    return strcmp((*user1)->name, (*user2)->name);
 }
 
 void app_free_app(App app)
@@ -74,8 +78,9 @@ void app_free_space(App app)
 
 void app_remove_user(App app, char *name)
 {
-    User user = hash_table_remove(app->users, name);
-    free_user(user);
+    //User user = hash_table_remove(app->users, name);
+    //free_user(user);
+    free_user(hash_table_get(app, name));
 }
 
 bool app_has_user(App app, char *name)
@@ -123,7 +128,8 @@ int app_SizeOfHash(App usern)
     return hash_table_size(usern->users);
 }
 
-int app_spacesCount(App app){
+int app_spacesCount(App app)
+{
     return SpaceSimulationCount(app->users);
 }
 
@@ -216,15 +222,22 @@ void app_Registar_Part(App app, char *name, char *identifi, float massa, float c
     }
 }
 
-void app_Modify_Part(app, name, IdenSpace, IdenPart, massa, carga, pix, piy, piz, vx, vy, vz)
+void app_Modify_Part(App app, char *name, char *IdenSpace, char *IdenPart, float massa, float carga, float pix, float piy, float piz, float vx, float vy, float vz)
 {
-    // FAZER AP
+    Modify_Part(app->users, name, IdenSpace, IdenPart, massa, carga, pix, piy, piz, vx, vy, vz);
 }
 
-int app_user_simulatorCount(App app){
-    return SimulationCount(app->users);
+int app_user_simulatorCount(App app, char* name)
+{
+    return SimulationCount(hash_table_get(app->users, name));
 }
 
-void* app_ConvertUserToArray(App app, int userCount){
-    return app_ConvertArray(hash_table_values(app->users), userCount);
+void *app_ConvertUserToArray(App app, int userCount)
+{
+    return ConvertArray(hash_table_values(app->users), userCount); // TODO: de certo modo fazer free do valor hash_tables_values
+}
+
+void app_Simulate(App app, char *name, char *IdentificadorEspaço, char *IdentificadorParticula, int tempo, int passo, char *file)
+{
+    printformulas(app->users, name, IdentificadorEspaço, IdentificadorParticula, tempo, passo, file);
 }

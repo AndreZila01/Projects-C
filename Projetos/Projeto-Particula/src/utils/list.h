@@ -42,7 +42,7 @@ bool list_is_empty(List list);
  * @param list The linked list.
  * @return size_t The number of elements in the list.
  */
-size_t list_size(List list);
+int list_size(List list);
 
 /**
  * @brief Returns the first element of the list.

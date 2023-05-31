@@ -5,6 +5,7 @@ UTILS+=src/utils/singly_linked_list.c
 
 MVC=src/views/cli.c
 MVC+=src/controllers/controllers.c
+MVC+=src/models/fisica.c
 MVC+=src/models/models.c
 
 ## Não alterar a partir daqui

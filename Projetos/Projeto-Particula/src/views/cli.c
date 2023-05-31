@@ -26,9 +26,9 @@ void EJ(App app, char *name)
     else
     {
         // app_free_app(app);
-        if (app_user_simulatorCount(app->users) > 0 && Simulation_OnOff(app->users)) // Não percebi nada!
+        if (/*app_user_simulatorCount(app->users, name) > 0 &&*/ Simulation_OnOff(app->users)) // Não percebi nada!
         {
-            app_remove_user(app, name);
+            app_remove_user(app->users, name);
             printf("Utilizador removido com sucesso.\n");
         }
         // else
@@ -45,11 +45,11 @@ void LJ(App app)
     else
     {
         if (userCount > 1)
-            qsort(users, userCount, sizeof(users), compareUsersByName);
+            qsort(users, userCount, sizeof(User), compareUsersByName);
         int count = 0;
         while (userCount != count)
         {
-            printf("%s %d %d\n", users[count]->name, app_spacesCount(users[count]), app_user_simulatorCount(users[count]));
+            printf("%s %d %d\n", users[count]->name, app_spacesCount(users[count]), app_user_simulatorCount(users[count], users[count]->name));
             count++;
         }
         free(users);
@@ -150,12 +150,33 @@ void AP(App app, char *name, char *IdenSpace, char *IdenPart)
     vz = atof(strtok(NULL, " "));
 
     free(row_contents);
-
+    
     app_Modify_Part(app, name, IdenSpace, IdenPart, massa, carga, pix, piy, piz, vx, vy, vz);
 }
 
-void S()
+void S(App app, char* name, char* IdentificadorEspaço, char* IdentificadorParticula)
 {
+    int tempo = 0, passo = 0;
+    char *row_contents = NULL;
+    size_t row_len = 0;
+
+    // MASSA >=0, CARGA percente a Z
+    getline(&row_contents, &row_len, stdin);
+    row_contents[strlen(row_contents) - 1] = '\0';
+    tempo = atoi(strtok(row_contents, " "));
+    passo = atoi(strtok(NULL, " "));
+
+    free(row_contents);
+    row_contents = NULL;
+
+    getline(&row_contents, &row_len, stdin);
+    row_contents[strlen(row_contents) - 1] = '\0';
+    char* file = strtok(row_contents, " ");
+
+    free(row_contents);
+    row_contents = NULL;
+
+    app_Simulate(app, name, IdentificadorEspaço, IdentificadorParticula, tempo, passo, file);
     // SimulationCount++;
 }
 
@@ -185,17 +206,12 @@ void run_cli()
         else if (strcmp(command, "RP") == 0) // Registar particula
             RP(app, strtok(NULL, " "), strtok(NULL, " "));
         else if (strcmp(command, "AP") == 0) // Alterar Particula
-        {
             AP(app, strtok(NULL, " "), strtok(NULL, " "), strtok(NULL, " "));
-        }
         else if (strcmp(command, "S") == 0) // Simular
-        {
-            S();
-        }
+            S(app, strtok(NULL, " "), strtok(NULL, " "), strtok(NULL, " "));
         else
-        {
             printf("Instrução inválida.\n");
-        }
+        
         free(line);
         line = NULL;
     }
