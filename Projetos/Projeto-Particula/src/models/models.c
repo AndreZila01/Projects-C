@@ -110,18 +110,10 @@ bool has_Particle(SpaceSimulation sim, char *name)
     return hash_table_get(sim->particle, name) != NULL;
 }
 
-int SimulationCount(User user)
+int SpaceSimulationCount(User user)
 {
     int value = hash_table_size(user->Spacesimulation);
-    if (value != 0)
-        return ((SpaceSimulation)(hash_table_size(user->Spacesimulation)))->SimulationCount;
-    else
-        return 0;
-}
-
-int SpaceSimulationCount(User sim)
-{
-    return ((SpaceSimulation)(hash_table_size(sim->Spacesimulation)))->SpaceSimulationCount;
+    return ((SpaceSimulation)(hash_table_size(user->Spacesimulation)))->SpaceSimulationCount;
 }
 
 bool Simulation_OnOff(User sim)
@@ -139,10 +131,10 @@ void *return_simulation(User user, char *name)
     return hash_table_get(user->Spacesimulation, name);
 }
 
-void *ConvertArray(List lst, int userCount)
+void *ConvertArray(List lst, int* userCount)
 {
-    userCount = list_size(lst);
-    User *user = malloc(sizeof(User) * userCount);
+    *userCount = list_size(lst);
+    User *user = malloc(sizeof(User) * (*userCount));
 
     int i = 0;
     list_iterator_start(lst);
@@ -214,3 +206,7 @@ void printformulas(User user, char *name, char *IdentificadorEspaço, char *Iden
         free(partdinamica);
     }
 }
+
+// int CountUser(User user){
+//     return 
+// }

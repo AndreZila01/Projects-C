@@ -61,12 +61,14 @@ void app_Modify_Part(App app, char *name, char *IdenSpace, char *IdenPart, float
 
 int compareUsersByName(void *Namea, void *Nameb);
 
-void *app_ConvertUserToArray(App app, int userCount);
+void *app_ConvertUserToArray(App app, int *userCount);
 
 int app_user_simulatorCount(App user, char* name);
 
 int app_spacesCount(App app);
 
 void app_Simulate(App app, char *name, char *IdentificadorEspaço, char *IdentificadorParticula, int tempo, int passo, char *file);
+
+int app_CounterUser(App app);
 
 #endif

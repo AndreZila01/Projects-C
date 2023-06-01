@@ -229,15 +229,19 @@ void app_Modify_Part(App app, char *name, char *IdenSpace, char *IdenPart, float
 
 int app_user_simulatorCount(App app, char* name)
 {
-    return SimulationCount(hash_table_get(app->users, name));
+    return SpaceSimulationCount(hash_table_get(app->users, name));
 }
 
-void *app_ConvertUserToArray(App app, int userCount)
+void *app_ConvertUserToArray(App app, int *userCount)
 {
-    return ConvertArray(hash_table_values(app->users), userCount); // TODO: de certo modo fazer free do valor hash_tables_values
+    return ConvertArray(hash_table_values(app->users), &userCount); // TODO: de certo modo fazer free do valor hash_tables_values
 }
 
 void app_Simulate(App app, char *name, char *IdentificadorEspaço, char *IdentificadorParticula, int tempo, int passo, char *file)
 {
     printformulas(app->users, name, IdentificadorEspaço, IdentificadorParticula, tempo, passo, file);
+}
+
+int app_CounterUser(App app){
+    return hash_table_size(app->users);
 }

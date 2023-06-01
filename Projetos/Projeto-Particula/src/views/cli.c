@@ -38,7 +38,7 @@ void EJ(App app, char *name)
 
 void LJ(App app)
 {
-    int userCount=0;
+    int userCount= app_CounterUser(app);
     User *users = app_ConvertUserToArray(app, &userCount);
     if (userCount == 0)
         printf("Não existem utilizadores registados.\n");
