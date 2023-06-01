@@ -26,9 +26,9 @@ void EJ(App app, char *name)
     else
     {
         // app_free_app(app);
-        if (/*app_user_simulatorCount(app->users, name) > 0 &&*/ Simulation_OnOff(app->users)) // Não percebi nada!
+        if (/*app_user_simulatorCount(app->users, name) > 0 &&*/ app_Simulation_OnOff(app, name)) // Não percebi nada!
         {
-            app_remove_user(app->users, name);
+            app_remove_user(app, name);
             printf("Utilizador removido com sucesso.\n");
         }
         // else
@@ -38,18 +38,19 @@ void EJ(App app, char *name)
 
 void LJ(App app)
 {
-    int userCount= app_CounterUser(app);
-    User *users = app_ConvertUserToArray(app, &userCount);
+    int userCount = app_CounterUser(app);
+    User *users = app_ConvertUserToArray(app, userCount);
     if (userCount == 0)
         printf("Não existem utilizadores registados.\n");
     else
     {
         if (userCount > 1)
-            qsort(users, userCount, sizeof(User), compareUsersByName);
+            qsort(users, userCount, sizeof(User), compare_users);
         int count = 0;
         while (userCount != count)
         {
-            printf("%s %d %d\n", users[count]->name, app_spacesCount(users[count]), app_user_simulatorCount(users[count], users[count]->name));
+            User user = users[count];
+            printf("%s %d %d\n", user->name, app_spacesCount(user), app_user_simulatorCount(user)); // ver o que está mal ao charmar users
             count++;
         }
         free(users);
@@ -62,8 +63,10 @@ void RE(App app, char *name)
         printf("Utilizador inexistente.\n");
     else
     {
-        app_register_simulation(app, name);
-        printf("Espaço de simulação registado com identificador IdentificadorEspaço.\n");
+        // app_register_simulation(app, name);
+        // printf("Espaço de simulação registado com identificador IdentificadorEspaço.\n");
+        char *space_id = app_register_simulation(app, name);
+        printf("Espaço de simulação registado com identificador %s.\n", space_id);
     }
 }
 
@@ -150,11 +153,11 @@ void AP(App app, char *name, char *IdenSpace, char *IdenPart)
     vz = atof(strtok(NULL, " "));
 
     free(row_contents);
-    
+
     app_Modify_Part(app, name, IdenSpace, IdenPart, massa, carga, pix, piy, piz, vx, vy, vz);
 }
 
-void S(App app, char* name, char* IdentificadorEspaço, char* IdentificadorParticula)
+void S(App app, char *name, char *IdentificadorEspaço, char *IdentificadorParticula)
 {
     int tempo = 0, passo = 0;
     char *row_contents = NULL;
@@ -171,7 +174,7 @@ void S(App app, char* name, char* IdentificadorEspaço, char* IdentificadorParti
 
     getline(&row_contents, &row_len, stdin);
     row_contents[strlen(row_contents) - 1] = '\0';
-    char* file = strtok(row_contents, " ");
+    char *file = strtok(row_contents, " ");
 
     free(row_contents);
     row_contents = NULL;
@@ -211,7 +214,7 @@ void run_cli()
             S(app, strtok(NULL, " "), strtok(NULL, " "), strtok(NULL, " "));
         else
             printf("Instrução inválida.\n");
-        
+
         free(line);
         line = NULL;
     }

@@ -43,7 +43,7 @@ User new_user(char *name)
     User user = malloc(sizeof(User_));
     user->name = strdup(name);
     user->simulation_on = false;
-    user->next_space_id=1;
+    user->next_space_id = 1;
     user->Spacesimulation = hash_table_create(0, hash_space_id, equal_ints, NULL, space_free);
     return user;
 }
@@ -63,26 +63,35 @@ void free_Simulacao(SpaceSimulation space)
     // TODO: Falta atualizar para os novos campos de User.
 }
 
-void register_simulation(User user)
+char *register_simulation(User user)
 {
-    // User user = hash_table_get(users, user_name);
-    //  0. Criar o identificador de espaço
+    // // User user = hash_table_get(users, user_name);
+    // //  0. Criar o identificador de espaço
+    // char space_id[80];
+    // // int space_id;
+    // sprintf(space_id, "%d", user->next_space_id);
+    // SpaceSimulation space = new_space(user->next_space_id);
+    // user->next_space_id++;
+
+    // hash_table_insert(user->Spacesimulation, space->id, space);
+    // // return space->id;
+
+    // User user = hash_table_get(app->users, user_name);
+
     char space_id[80];
-    // int space_id;
     sprintf(space_id, "%d", user->next_space_id);
-    SpaceSimulation space = new_space(user->next_space_id);
     user->next_space_id++;
 
+    SpaceSimulation space = new_space(space_id);
+
     hash_table_insert(user->Spacesimulation, space->id, space);
-    // return space->id;
+    return space->id;
 }
 
 SpaceSimulation new_space(char *id)
 {
     SpaceSimulation space = malloc(sizeof(SpaceSimulation_));
-    space->id = malloc(sizeof(int));
-    *(space->id) = id;
-    // space
+    space->id = strdup(id);
     return space;
 }
 
@@ -96,7 +105,6 @@ void free_Space(User user)
 {
     free(user->Spacesimulation);
     free(user->name);
-    free(user->next_space_id);
     free(user);
 }
 
@@ -110,15 +118,17 @@ bool has_Particle(SpaceSimulation sim, char *name)
     return hash_table_get(sim->particle, name) != NULL;
 }
 
-int SpaceSimulationCount(User user)
+int SpaceSimulationCount(void *values)
 {
+    User user = (User)values;
     int value = hash_table_size(user->Spacesimulation);
-    return ((SpaceSimulation)(hash_table_size(user->Spacesimulation)))->SpaceSimulationCount;
+    return value;
+    // return (SpaceSimulation(hash_table_size(user->Spacesimulation)))->SpaceSimulationCount;
 }
 
-bool Simulation_OnOff(User sim)
+bool Simulation_OnOff(User user)
 {
-    return sim->simulation_on;
+    return user->simulation_on;
 }
 
 int size_Particle(SpaceSimulation sim)
@@ -131,29 +141,78 @@ void *return_simulation(User user, char *name)
     return hash_table_get(user->Spacesimulation, name);
 }
 
-void *ConvertArray(List lst, int* userCount)
+void *ConvertArray(List lst, int userCount)
 {
-    *userCount = list_size(lst);
-    User *user = malloc(sizeof(User) * (*userCount));
+    // User *user = (User)malloc(sizeof(User) * userCount);
 
-    int i = 0;
-    list_iterator_start(lst);
-    while (list_iterator_has_next(lst))
-        user[i++] = list_iterator_get_next(lst);
+    // int i = 0;
+    // list_iterator_start(lst);
+    // while (list_iterator_has_next(lst))
+    //     user[i++] = list_iterator_get_next(lst);
 
-    return user;
+    // Convert the list to an array
+    void *array = malloc(sizeof(User) * userCount);
+    list_to_array(lst, array);
+
+    return array;
 }
 
 void Modify_Part(User user, char *name, char *IdenSpace, char *IdenPart, float massa, float carga, float pix, float piy, float piz, float vx, float vy, float vz)
 {
+    SpaceSimulation simulacao = hash_table_get(user->Spacesimulation, IdenSpace);
+
+    if (simulacao == NULL)
+        printf("Espaço de simulação inexistente.\n"); // meter isto numa funcao que faca check e retorne se existir
+    else
+    {
+        Particle part = hash_table_get(simulacao->particle, IdenPart);
+        if (simulacao == NULL)
+            printf("Partícula inexistente.\n");
+        else
+        {
+            if (pix == 0 && piy == 0 && piz == 0)
+            {
+                hash_table_remove(simulacao->particle, part->NomeUser);
+                printf("Partícula removida com sucesso.\n");
+            }
+            else
+            {
+                if (massa > 0)
+                {
+                    part->massa = massa;
+                    part->NomeUser = name;
+                    part->carga = carga;
+                    part->x = pix;
+                    part->y = piy;
+                    part->z = piz;
+                    part->Vx = vx;
+                    part->Vy = vy;
+                    part->Vz = vz;
+
+                    printf("Partícula alterada com sucesso.\n");
+                }
+                else
+                    printf("Massa inválida.\n");
+            }
+        }
+    }
 }
 
-void printformulas(User user, char *name, char *IdentificadorEspaço, char *IdentificadorParticula, int tempo, int passo, char *file)
+void printformulas(User user, char *IdentificadorEspaço, char *IdentificadorParticula, int tempo, int passo, char *files)
 {
-    FILE *files;
-
-    if (!strcmp(file, "-"))
-        file = stdout;
+    FILE *file;
+    if (strcmp(files, "-") == 0)
+    {
+        file = stdout; // Mostrar na consola
+    }
+    else
+    {
+        file = fopen(files, "w"); // Abrir arquivo para escrita
+        if (file == NULL)
+        {
+            printf("Erro ao abrir o arquivo %s\n", files);
+        }
+    }
 
     float xi = 0, yi = 0, zi = 0, vix = 0, viy = 0, viz = 0, fgx = 0, fgy = 0, fgz = 0, fex = 0, fey = 0, fez = 0, SFx = 0, SFy = 0, SFz = 0, acx = 0, acy = 0, acz = 0;
     Particle partdinamica = hash_table_get(hash_table_get(user->Spacesimulation, IdentificadorEspaço), IdentificadorParticula);
@@ -205,8 +264,13 @@ void printformulas(User user, char *name, char *IdentificadorEspaço, char *Iden
 
         free(partdinamica);
     }
+
+    if (file != stdout)
+    {
+        fclose(file);
+    }
 }
 
 // int CountUser(User user){
-//     return 
+//     return
 // }

@@ -11,7 +11,7 @@ typedef struct
 
 App app_new();
 
-void list_user(App usern);
+// void list_user(App usern);
 
 void app_free_app(App app);
 
@@ -25,7 +25,7 @@ void app_free_simulation(App usern, char *name);
 
 bool app_has_simulation(App usern, char *name);
 
-void app_register_simulation(App app, char *user_name);
+void* app_register_simulation(App app, char *user_name);
 
 int app_SizeOfHash(App usern);
 
@@ -59,16 +59,18 @@ void app_Registar_Part(App app, char *name, char *identifi, float massa, float c
 
 void app_Modify_Part(App app, char *name, char *IdenSpace, char *IdenPart, float massa, float carga, float pix, float piy, float piz, float vx, float vy, float vz);
 
-int compareUsersByName(void *Namea, void *Nameb);
+int compare_users(const void* a, const void* b);
 
-void *app_ConvertUserToArray(App app, int *userCount);
+void *app_ConvertUserToArray(App app, int userCount);
 
-int app_user_simulatorCount(App user, char* name);
+int app_user_simulatorCount(void* user);
 
-int app_spacesCount(App app);
+int app_spacesCount(void* user);
 
 void app_Simulate(App app, char *name, char *IdentificadorEspaço, char *IdentificadorParticula, int tempo, int passo, char *file);
 
 int app_CounterUser(App app);
+
+bool app_Simulation_OnOff(App app, char *name);
 
 #endif

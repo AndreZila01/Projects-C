@@ -41,7 +41,7 @@ void free_user(User user);
 
 bool equal_ints(void* key1, void* key2);
 
-void register_simulation(User users);
+char* register_simulation(User user);
 
 SpaceSimulation new_space(char* id);
 
@@ -59,13 +59,13 @@ void* return_simulation(User user, char* name);
 
 bool Simulation_OnOff(User sim);
 
-void* ConvertArray(List lst, int *userCount);
+void* ConvertArray(List lst, int userCount);
 
-int SpaceSimulationCount(User user);
+int SpaceSimulationCount(void* values);
 
 void Modify_Part(User user, char* name, char* IdenSpace, char* IdenPart, float massa, float carga, float pix, float piy, float piz, float vx, float vy, float vz);
 
-void printformulas(User user, char* name, char* IdentificadorEspaço, char* IdentificadorParticula, int tempo, int passo, char* file);
+void printformulas(User user, char* IdentificadorEspaço, char* IdentificadorParticula, int tempo, int passo, char* file);
 
 int CountUser(User user);
 #endif

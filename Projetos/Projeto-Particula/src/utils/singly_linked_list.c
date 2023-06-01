@@ -230,7 +230,7 @@ void list_insert_last(List list, void *element)
  */
 void list_insert(List list, void *element, int position)
 {
-    size_t v = list_size(list);
+    int v = list_size(list);
 
     /*if (position < 0 || position > v)
     {
@@ -307,6 +307,8 @@ void *list_remove_last(List list)
         node = node->next;
         i++;
     }
+
+    return NULL;
 }
 
 /**
