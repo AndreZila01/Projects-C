@@ -31,8 +31,8 @@ void EJ(App app, char *name)
             app_remove_user(app, name);
             printf("Utilizador removido com sucesso.\n");
         }
-        // else
-        //   printf("Utilizador tem espaços de simulação sem simulações realizadas.\n");
+        else
+          printf("Utilizador tem espaços de simulação sem simulações realizadas.\n");
     }
 }
 
@@ -70,15 +70,15 @@ void RE(App app, char *name)
     }
 }
 
-void EE(App app, char *name)
+void EE(App app, char *name, char* identif)
 {
     if (!app_has_user(app, name))
         printf("Utilizador não existente.\n");
     else
     {
-        if (app_has_simulation(app, name))
+        if (app_has_simulation(app, identif))
         {
-            app_free_simulation(app, name);
+            app_free_simulation(app, identif);
             printf("Espaço de simulação removido com sucesso.\n");
         }
         else
@@ -205,7 +205,7 @@ void run_cli()
         else if (strcmp(command, "RE") == 0) // Registar Simulacao
             RE(app, strtok(NULL, " "));
         else if (strcmp(command, "EE") == 0) // Remover Simulacao
-            EE(app, strtok(NULL, " "));
+            EE(app, strtok(NULL, " "), strtok(NULL, " "));
         else if (strcmp(command, "RP") == 0) // Registar particula
             RP(app, strtok(NULL, " "), strtok(NULL, " "));
         else if (strcmp(command, "AP") == 0) // Alterar Particula

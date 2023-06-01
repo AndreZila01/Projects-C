@@ -143,16 +143,17 @@ void *return_simulation(User user, char *name)
 
 void *ConvertArray(List lst, int userCount)
 {
-    // User *user = (User)malloc(sizeof(User) * userCount);
+    void** array = (void**)malloc(userCount * sizeof(void*));
 
-    // int i = 0;
-    // list_iterator_start(lst);
-    // while (list_iterator_has_next(lst))
-    //     user[i++] = list_iterator_get_next(lst);
+    int i = 0;
+    list_iterator_start(lst);
+    while (list_iterator_has_next(lst))
+        array[i++] = list_iterator_get_next(lst);
 
     // Convert the list to an array
-    void *array = malloc(sizeof(User) * userCount);
-    list_to_array(lst, array);
+    // void *array = malloc(sizeof(User) * userCount);
+    // list_to_array(lst, array);
+    // free(user);
 
     return array;
 }
