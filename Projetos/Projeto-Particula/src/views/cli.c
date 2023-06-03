@@ -26,13 +26,13 @@ void EJ(App app, char *name)
     else
     {
         // app_free_app(app);
-        if (/*app_user_simulatorCount(app->users, name) > 0 &&*/ app_Simulation_OnOff(app, name)) // Não percebi nada!
+        if (app_user_simulatorCount(app->users) > 0 && app_Simulation_OnOff(app, name)) // Não percebi nada!
         {
             app_remove_user(app, name);
             printf("Utilizador removido com sucesso.\n");
         }
         else
-          printf("Utilizador tem espaços de simulação sem simulações realizadas.\n");
+            printf("Utilizador tem espaços de simulação sem simulações realizadas.\n");
     }
 }
 
@@ -70,13 +70,13 @@ void RE(App app, char *name)
     }
 }
 
-void EE(App app, char *name, char* identif)
+void EE(App app, char *name, char *identif)
 {
     if (!app_has_user(app, name))
         printf("Utilizador não existente.\n");
     else
     {
-        if (app_has_simulation(app, identif))
+        if (app_has_simulation(app, name, identif))
         {
             app_free_simulation(app, identif);
             printf("Espaço de simulação removido com sucesso.\n");
@@ -88,7 +88,7 @@ void EE(App app, char *name, char* identif)
 
 void RP(App app, char *name, char *identifi)
 {
-    int massa = 0, carga = 0, pix = 0, piy = 0, piz = 0, vx = 0, vy = 0, vz = 0;
+    float massa = 0, carga = 0, pix = 0, piy = 0, piz = 0, vx = 0, vy = 0, vz = 0;
     char *row_contents = NULL;
     size_t row_len = 0;
 
@@ -207,11 +207,26 @@ void run_cli()
         else if (strcmp(command, "EE") == 0) // Remover Simulacao
             EE(app, strtok(NULL, " "), strtok(NULL, " "));
         else if (strcmp(command, "RP") == 0) // Registar particula
-            RP(app, strtok(NULL, " "), strtok(NULL, " "));
-        else if (strcmp(command, "AP") == 0) // Alterar Particula
-            AP(app, strtok(NULL, " "), strtok(NULL, " "), strtok(NULL, " "));
+        {
+            char *name = strtok(NULL, " ");
+            char *space_id = strtok(NULL, " ");
+            RP(app, name, space_id);
+            // RP(app, strtok(NULL, " "), strtok(NULL, " "));
+        }
+        else if (strcmp(command, "AP") == 0)
+        { // Alterar Particula
+            char *v1 = strtok(NULL, " ");
+            char *v2 = strtok(NULL, " ");
+            char *v3 = strtok(NULL, " ");
+            AP(app, v1, v2, v3);
+        }
         else if (strcmp(command, "S") == 0) // Simular
-            S(app, strtok(NULL, " "), strtok(NULL, " "), strtok(NULL, " "));
+        {
+            char* v1 = strtok(NULL, " ");
+            char* v2 = strtok(NULL, " ");
+            char* v3 = strtok(NULL, " ");
+            S(app, v1, v2, v3);
+        }
         else
             printf("Instrução inválida.\n");
 

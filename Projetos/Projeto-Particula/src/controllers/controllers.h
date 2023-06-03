@@ -23,7 +23,7 @@ User app_new_simulation();
 
 void app_free_simulation(App usern, char *name);
 
-bool app_has_simulation(App usern, char *name);
+bool app_has_simulation(App app, char *name, char* iden);
 
 void* app_register_simulation(App app, char *user_name);
 
@@ -32,6 +32,8 @@ int app_SizeOfHash(App usern);
 void *app_ValueOfUser(App app, char *name);
 
 int app_hash_ints(void *key, int size);
+
+bool app_has_simulation(App app, char *name, char* iden);
 
 void app_remove_user(App app, char *name);
 

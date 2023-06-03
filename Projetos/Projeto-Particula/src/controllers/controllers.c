@@ -119,9 +119,9 @@ void app_free_simulation(App app, char *name)
     free_Space(hash_table_get(app->users, name));
 }
 
-bool app_has_simulation(App app, char *name)
+bool app_has_simulation(App app, char *name, char* iden)
 {
-    return has_simulation(hash_table_get(app->users, name), name);
+    return has_simulation(app_ValueOfUser(app, name), iden);
 }
 
 int app_SizeOfHash(App usern)
@@ -194,7 +194,7 @@ void app_Registar_Part(App app, char *name, char *identifi, float massa, float c
         printf("Utilizador inexistente.\n");
     else
     {
-        if (!app_has_simulation(app, name))
+        if (!app_has_simulation(app, name, identifi))
             printf("Espaço de simulação inexistente.\n");
         else
         {
@@ -216,7 +216,7 @@ void app_Registar_Part(App app, char *name, char *identifi, float massa, float c
                 part->z = piz;
 
                 hash_table_insert(sim->particle, name, part);
-                printf("Partícula registada com identificador IdentificadorParticula.\n");
+                printf("Partícula registada com identificador %d.\n", part->idParticula);
             }
             else
                 printf("Massa inválida.\n");
@@ -257,5 +257,5 @@ int app_CounterUser(App app)
 
 bool app_Simulation_OnOff(App app, char *name)
 {
-    return Simulation_OnOff(hash_table_get(app->users, name));
+    return (!Simulation_OnOff(hash_table_get(app->users, name)));
 }

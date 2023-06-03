@@ -84,6 +84,8 @@ char *register_simulation(User user)
 
     SpaceSimulation space = new_space(space_id);
 
+    space->SpaceSimulationCount = 0;
+    space->particle = hash_table_create(1, hash_space_id, equal_ints, NULL, space_free);
     hash_table_insert(user->Spacesimulation, space->id, space);
     return space->id;
 }
@@ -143,7 +145,7 @@ void *return_simulation(User user, char *name)
 
 void *ConvertArray(List lst, int userCount)
 {
-    void** array = (void**)malloc(userCount * sizeof(void*));
+    void **array = (void **)malloc(userCount * sizeof(void *));
 
     int i = 0;
     list_iterator_start(lst);
@@ -224,15 +226,22 @@ void printformulas(User user, char *IdentificadorEspaço, char *IdentificadorPar
     viy = partdinamica->Vy;
     viz = partdinamica->Vz;
 
-    int value = hash_table_size(((SpaceSimulation)(hash_table_get(user->Spacesimulation, IdentificadorEspaço)))->particle);
+    /*while (list_iterator_has_next(lst))
+        array[i++] = list_iterator_get_next(lst);*/
+    SpaceSimulation space = hash_table_get(user->Spacesimulation, IdentificadorEspaço);
+    //int valuesss = hash_table_size(space->particle); // hash_table_size(((SpaceSimulation)(hash_table_get(user->Spacesimulation, IdentificadorEspaço)))->particle);
 
-    for (int vs = 0; vs < value; vs++)
+    List part = hash_table_values(space->particle);
+    for (int temp = 0; temp <= tempo; temp++)
     {
-        Particle partestatic = hash_table_get(((SpaceSimulation)(hash_table_get(user->Spacesimulation, IdentificadorEspaço)))->particle, "" + vs); // mal feito
-        for (int temp = 0; temp <= tempo; temp++)
+        // Particle partestatic = hash_table_get(((SpaceSimulation)(hash_table_get(user->Spacesimulation, IdentificadorEspaço)))->particle, "" + vs); // mal feito
+
+        // Particle partestatic = hash_table_get(list_iterator_get_next(space->particle), IdentificadorParticula);
+        if (temp != 0)
         {
-            if (temp != 0)
+            while (list_iterator_has_next(part))
             {
+                Particle partestatic = list_iterator_get_next(part);
                 partdinamica->x = /*fabs*/ (FPosicao(xi, partdinamica->Vx, temp));
                 partdinamica->Vx = /*fabs*/ (FVeloc(xi, FPosicao(xi, vix, temp), 0, tempo)); // a velocidade tb muda, sempre??
                 fgx = /*fabs*/ (FForcaGraf(partdinamica->massa, partestatic->massa, distancia(partdinamica, partestatic)));
@@ -256,15 +265,16 @@ void printformulas(User user, char *IdentificadorEspaço, char *IdentificadorPar
                 SFz = /*fabs*/ (fgz + fez);
                 acz = /*fabs*/ (FAcelaracao(SFz, partdinamica->massa)); // está sempre a mudar???
             }
-            if (tempo % passo == 0)
-                printf("%d, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e", temp, partdinamica->x, partdinamica->y, partdinamica->z, partdinamica->Vx, partdinamica->Vy, partdinamica->Vz, acx, acy, acz, fgx);
-            printf(", %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e \n", fgy, fgz, fex, fey, fez, SFx, SFy, SFz);
-            free(partestatic);
         }
+
+        if (tempo % passo == 0)
+            printf("%d, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e", temp, partdinamica->x, partdinamica->y, partdinamica->z, partdinamica->Vx, partdinamica->Vy, partdinamica->Vz, acx, acy, acz, fgx);
+        printf(", %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e, %6.3e \n", fgy, fgz, fex, fey, fez, SFx, SFy, SFz);
         ((SpaceSimulation)hash_table_get(user->Spacesimulation, IdentificadorEspaço))->SimulationCount++;
 
         free(partdinamica);
     }
+    free(part);
 
     if (file != stdout)
     {
